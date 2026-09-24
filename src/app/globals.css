@@ -1,0 +1,151 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+
+  --color-brand-50: #eef6fc;
+  --color-brand-100: #d8ebf8;
+  --color-brand-200: #b3d7f1;
+  --color-brand-300: #7dbae5;
+  --color-brand-400: #3f96d4;
+  --color-brand-500: #1476bc;
+  --color-brand-600: #005ea3;
+  --color-brand-700: #004b86;
+  --color-brand-800: #003d6e;
+  --color-brand-900: #002f56;
+
+  --color-gold-300: #ffe08a;
+  --color-gold-400: #ffd05c;
+  --color-gold-500: #fdbc12;
+  --color-gold-600: #e5a50a;
+  --color-gold-700: #c48808;
+
+  --color-ink: #0c1a2b;
+}
+
+:root {
+  --background: #f4f7fb;
+  --foreground: var(--color-ink);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-55;
+  }
+
+  .btn-primary {
+    @apply bg-brand-600 text-white hover:bg-brand-700 focus-visible:outline-brand-600;
+  }
+
+  .btn-secondary {
+    @apply border border-slate-300 bg-white text-slate-800 hover:border-slate-400 hover:bg-slate-50 focus-visible:outline-slate-400;
+  }
+
+  .btn-danger {
+    @apply border border-red-200 bg-white text-red-700 hover:bg-red-50 focus-visible:outline-red-500;
+  }
+
+  .btn-gold {
+    @apply bg-gold-500 text-ink hover:bg-gold-600 focus-visible:outline-gold-600;
+  }
+
+  .btn-sm {
+    @apply min-h-9 px-3 py-1.5 text-xs;
+  }
+
+  .field {
+    @apply w-full rounded-lg border border-slate-300 bg-white px-3.5 py-3 text-base text-ink placeholder:text-slate-400 outline-none transition focus:border-brand-600 focus:ring-2 focus:ring-brand-100;
+  }
+
+  .field-sm {
+    @apply w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-ink placeholder:text-slate-400 outline-none transition focus:border-brand-600 focus:ring-2 focus:ring-brand-100;
+  }
+
+  .field-label {
+    @apply mb-1.5 block text-sm font-medium text-slate-700;
+  }
+
+  .panel {
+    @apply border border-slate-200 bg-white;
+  }
+
+  .panel-title {
+    @apply text-base font-bold text-ink;
+  }
+
+  .page-title {
+    @apply text-2xl font-bold tracking-tight text-ink sm:text-3xl;
+  }
+
+  .page-subtitle {
+    @apply mt-1 text-sm leading-relaxed text-slate-600;
+  }
+
+  .alert-error {
+    @apply rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-800;
+  }
+
+  .alert-warn {
+    @apply rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-900;
+  }
+
+  .alert-info {
+    @apply rounded-lg border border-brand-200 bg-brand-50 px-4 py-3 text-sm font-medium text-brand-800;
+  }
+
+  .status-pill {
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold;
+  }
+}
+
+@page {
+  size: A4;
+  margin: 14mm 12mm;
+}
+
+@media print {
+  html,
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  .print-area {
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+  }
+
+  .print-area thead {
+    display: table-header-group;
+  }
+
+  .print-area tr,
+  .print-area header,
+  .print-area table {
+    break-inside: avoid;
+  }
+
+  .print-area img {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+}
+
+.print\:print-color-adjust-exact {
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}

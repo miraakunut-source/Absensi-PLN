@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { deleteForm, listForms, listResponses } from "@/lib/formStorage";
+import { countResponses, deleteForm, listForms } from "@/lib/formStorage";
 import { getFormOpenState, getOpenStateMessage } from "@/lib/formStatus";
 import type { FormConfig } from "@/types";
 
@@ -44,8 +44,8 @@ export default function AdminDashboardPage() {
         const entries = await Promise.all(
           list.map(async (form) => {
             try {
-              const rows = await listResponses(form.id);
-              return [form.id, rows.length] as const;
+              const count = await countResponses(form.id);
+              return [form.id, count] as const;
             } catch {
               return [form.id, 0] as const;
             }

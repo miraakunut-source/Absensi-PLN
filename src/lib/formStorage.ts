@@ -16,8 +16,21 @@ import { createBlankForm, defaultFormConfig } from "@/lib/defaultForm";
 import { generateId } from "@/lib/ids";
 import { getFormOpenState } from "@/lib/formStatus";
 import { db } from "@/lib/firebase";
-import { isSupabaseConfigured, supabase } from "@/lib/supabaseClient";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import type { FormConfig, FormOpenState, FormResponse } from "@/types";
+
+function isSupabaseEnvConfigured(): boolean {
+  return Boolean(
+    process.env.NEXT_PUBLIC_SUPABASE_URL &&
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+  );
+}
+
+async function getSupabase(): Promise<SupabaseClient | null> {
+  if (!isSupabaseEnvConfigured()) return null;
+  const { supabase } = await import("@/lib/supabaseClient");
+  return supabase;
+}
 
 export interface SubmitPayload {
   formId: string;
@@ -219,7 +232,8 @@ export async function getConfig(formId: string): Promise<FormConfig | null> {
     }
   }
 
-  if (isSupabaseConfigured && supabase) {
+  const supabase = await getSupabase();
+  if (supabase) {
     const { data, error } = await supabase
       .from("forms")
       .select("*")
@@ -260,7 +274,8 @@ export async function getConfigByToken(
     }
   }
 
-  if (isSupabaseConfigured && supabase) {
+  const supabase = await getSupabase();
+  if (supabase) {
     const { data, error } = await supabase
       .from("forms")
       .select("*")
@@ -309,7 +324,8 @@ export async function listForms(): Promise<FormConfig[]> {
     return merged.length > 0 ? merged : [defaultFormConfig];
   }
 
-  if (isSupabaseConfigured && supabase) {
+  const supabase = await getSupabase();
+  if (supabase) {
     const { data, error } = await supabase
       .from("forms")
       .select("*")
@@ -354,7 +370,8 @@ export async function saveConfig(config: FormConfig): Promise<void> {
     return;
   }
 
-  if (isSupabaseConfigured && supabase) {
+  const supabase = await getSupabase();
+  if (supabase) {
     const { error } = await supabase.from("forms").upsert({
       id: next.id,
       token: next.token,
@@ -401,7 +418,8 @@ export async function deleteForm(formId: string): Promise<void> {
     return;
   }
 
-  if (isSupabaseConfigured && supabase) {
+  const supabase = await getSupabase();
+  if (supabase) {
     await supabase.from("form_responses").delete().eq("form_id", formId);
     const { error } = await supabase.from("forms").delete().eq("id", formId);
     if (error) {
@@ -424,7 +442,8 @@ export async function listResponses(
     return rows;
   }
 
-  if (isSupabaseConfigured && supabase) {
+  const supabase = await getSupabase();
+  if (supabase) {
     const { data, error } = await supabase
       .from("form_responses")
       .select("*")
@@ -457,7 +476,8 @@ export async function countResponses(formId: string): Promise<number> {
     return aggregate.data().count;
   }
 
-  if (isSupabaseConfigured && supabase) {
+  const supabase = await getSupabase();
+  if (supabase) {
     const { count, error } = await supabase
       .from("form_responses")
       .select("id", { count: "exact", head: true })
@@ -484,15 +504,22 @@ export async function getFormOpenStateWithCount(
   }
 }
 
+export interface SubmitOptions {
+  signatureEndpoint?: string;
+}
+
 export async function submitResponse(
   payload: SubmitPayload,
+  options: SubmitOptions = {},
 ): Promise<SubmitResult> {
-  const config = await getConfig(payload.formId);
+  const [config, count] = await Promise.all([
+    getConfig(payload.formId),
+    countResponses(payload.formId),
+  ]);
   if (!config) {
     throw new Error("Form tidak ditemukan");
   }
 
-  const count = await countResponses(payload.formId);
   const state = getFormOpenState(config, count);
   if (state !== "open") {
     const messages: Record<FormOpenState, string> = {
@@ -508,7 +535,7 @@ export async function submitResponse(
   if (db) {
     let signatureUrl: string | null = null;
     try {
-      const response = await fetch("/api/signature", {
+      const response = await fetch(options.signatureEndpoint ?? "/api/signature", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -528,24 +555,25 @@ export async function submitResponse(
     }
 
     const now = new Date().toISOString();
+    const storedSignature = signatureUrl ? null : payload.signatureDataUrl;
     const created = await addDoc(collection(db, "form_responses"), {
       formId: payload.formId,
       answers: payload.answers,
       respondentName: payload.respondentName ?? null,
       signatureUrl,
-      signatureDataUrl: payload.signatureDataUrl,
+      signatureDataUrl: storedSignature,
       createdAt: now,
     });
 
     return {
       id: created.id,
       signatureUrl,
-      signatureDataUrl: payload.signatureDataUrl,
+      signatureDataUrl: storedSignature,
       createdAt: now,
     };
   }
 
-  if (isSupabaseConfigured) {
+  if (isSupabaseEnvConfigured()) {
     const response = await fetch("/api/submit", {
       method: "POST",
       headers: {

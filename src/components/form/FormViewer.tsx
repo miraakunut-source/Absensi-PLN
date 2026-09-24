@@ -2,7 +2,6 @@
 
 import dynamic from "next/dynamic";
 import { useMemo, useState } from "react";
-import { submitResponse } from "@/lib/formStorage";
 import type { FormConfig, Question } from "@/types";
 
 const SignaturePad = dynamic(() => import("./SignaturePad"), {
@@ -258,12 +257,27 @@ export default function FormViewer({ config, disabled }: FormViewerProps) {
         ? nameValue.join(", ")
         : (nameValue ?? "");
 
-      await submitResponse({
-        formId: config.id,
-        answers,
-        signatureDataUrl: signature,
-        respondentName,
+      const response = await fetch("/api/public/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          formId: config.id,
+          answers,
+          signatureDataUrl: signature,
+          respondentName,
+        }),
       });
+
+      if (!response.ok) {
+        const data = (await response.json().catch(() => ({}))) as {
+          error?: string;
+        };
+        throw new Error(
+          data.error ||
+            "Absensi gagal dikirim. Periksa koneksi internet Anda lalu coba lagi.",
+        );
+      }
+
       setSubmitted(true);
     } catch (submitError) {
       setError(

@@ -6,9 +6,14 @@ import EventHeader from "@/components/public/EventHeader";
 import PublicShell from "@/components/public/PublicShell";
 import StatusPanel from "@/components/public/StatusPanel";
 import FormViewer from "@/components/form/FormViewer";
-import { getConfig, getConfigByToken } from "@/lib/formStorage";
-import { getFormOpenState, getOpenStateMessage } from "@/lib/formStatus";
+import { getOpenStateMessage } from "@/lib/formStatus";
 import type { FormConfig, FormOpenState } from "@/types";
+
+interface PublicFormResponse {
+  config?: FormConfig;
+  openState?: FormOpenState;
+  error?: string;
+}
 
 function LoadingPanel({ label }: { label: string }) {
   return (
@@ -41,17 +46,29 @@ function AbsenFormContent({ id }: { id: string }) {
 
     (async () => {
       try {
-        const existing = (await getConfigByToken(id)) ?? (await getConfig(id));
-        if (cancelled) return;
-        if (!existing) {
+        const query = `token=${encodeURIComponent(id)}&id=${encodeURIComponent(id)}`;
+        const response = await fetch(`/api/public/form?${query}`);
+        if (response.status === 404) {
+          if (cancelled) return;
           setError("not_found");
           return;
         }
-        const { countResponses } = await import("@/lib/formStorage");
-        const count = await countResponses(existing.id);
+        if (!response.ok) {
+          const failed = (await response
+            .json()
+            .catch(() => ({}))) as PublicFormResponse;
+          throw new Error(
+            failed.error || "Formulir gagal dimuat. Periksa koneksi internet Anda.",
+          );
+        }
+        const data = (await response.json()) as PublicFormResponse;
         if (cancelled) return;
-        setConfig(existing);
-        setOpenState(getFormOpenState(existing, count));
+        if (!data.config || !data.openState) {
+          setError("not_found");
+          return;
+        }
+        setConfig(data.config);
+        setOpenState(data.openState);
       } catch (loadError) {
         if (cancelled) return;
         setError(

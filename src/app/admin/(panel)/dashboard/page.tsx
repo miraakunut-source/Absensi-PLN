@@ -11,6 +11,7 @@ import EmptyState from "@/components/ui/EmptyState";
 import PageHeader from "@/components/ui/PageHeader";
 import { countResponses, deleteForm, listForms } from "@/lib/formStorage";
 import { getFormOpenState, getOpenStateMessage } from "@/lib/formStatus";
+import { generateId } from "@/lib/ids";
 import type { FormConfig } from "@/types";
 
 interface DashboardStats {
@@ -101,11 +102,9 @@ export default function AdminDashboardPage() {
   const handleCreate = async () => {
     setBusyId("new");
     try {
-      const { createForm } = await import("@/lib/formStorage");
-      const form = await createForm({
-        title: "Kegiatan Absensi Baru",
-      });
-      router.push(`/admin/form/${encodeURIComponent(form.id)}/edit`);
+      router.push(
+        `/admin/form/${encodeURIComponent(generateId("kegiatan"))}/edit?draft=1`,
+      );
     } catch (createError) {
       setError(
         createError instanceof Error
@@ -190,7 +189,7 @@ export default function AdminDashboardPage() {
     <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:py-8">
       <PageHeader
         title="Dashboard absensi"
-        description="Ringkasan kegiatan, jumlah peserta, serta kontrol buka dan tutup absensi peserta."
+        description="Ringkasan kegiatan, jumlah peserta, serta kontrol buka dan tutup absensi peserta. Formulir baru hanya tersimpan setelah Anda menekan Simpan formulir di editor."
         actions={
           <Button
             size="lg"
@@ -242,6 +241,7 @@ export default function AdminDashboardPage() {
           </div>
         ) : forms.length === 0 ? (
           <EmptyState
+            compact
             title="Belum ada kegiatan"
             description="Buat kegiatan baru untuk menyiapkan form absensi, lalu bagikan QR Code kepada peserta."
             action={
@@ -269,7 +269,9 @@ export default function AdminDashboardPage() {
                 >
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <p className="type-heading">{form.title}</p>
+                      <p className="type-heading min-w-0 break-words">
+                        {form.title}
+                      </p>
                       <Badge tone={open ? "success" : "neutral"}>
                         {open ? "Dibuka" : getOpenStateMessage(state) || "Ditutup"}
                       </Badge>

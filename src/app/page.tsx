@@ -55,6 +55,36 @@ export default function HomePage() {
             </div>
           </div>
         </Card>
+        <Card className="mt-6">
+          <CardHeader
+            title="Cara kerja peserta"
+            description="Tiga langkah, tanpa akun dan tanpa aplikasi."
+          />
+          <ol className="grid gap-4 px-5 py-5 sm:grid-cols-3">
+            {[
+              {
+                step: "Pindai",
+                text: "Buka kamera HP dan arahkan ke QR Code kegiatan yang ditampilkan panitia.",
+              },
+              {
+                step: "Isi",
+                text: "Lengkapi data yang diminta halaman demi halaman, lalu bubuhkan tanda tangan.",
+              },
+              {
+                step: "Kirim",
+                text: "Klik kirim absensi. Data langsung tercatat di rekap panitia beserta tanda tangannya.",
+              },
+            ].map((item, index) => (
+              <li key={item.step} className="border-l-2 border-gold-500 pl-4">
+                <p className="type-caption">
+                  Langkah {index + 1}
+                </p>
+                <p className="type-heading mt-1">{item.step}</p>
+                <p className="type-body mt-1 text-muted">{item.text}</p>
+              </li>
+            ))}
+          </ol>
+        </Card>
       </main>
 
       <footer className="border-t border-line bg-surface">

@@ -8,6 +8,7 @@ import Alert from "@/components/ui/Alert";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 import Field, { CONTROL_CLASS } from "@/components/ui/Field";
+import PasswordInput from "@/components/ui/PasswordInput";
 import {
   isFirebaseConfigured,
   loginAdmin,
@@ -126,6 +127,7 @@ export default function AdminLoginPage() {
                   autoCorrect="off"
                   spellCheck={false}
                   required
+                  suppressHydrationWarning
                   className={CONTROL_CLASS}
                   placeholder="admin@plnup3kediri.id"
                   value={email}
@@ -134,15 +136,13 @@ export default function AdminLoginPage() {
               </Field>
 
               <Field label="Password" htmlFor="password">
-                <input
+                <PasswordInput
                   id="password"
-                  type="password"
                   autoComplete="current-password"
                   autoCapitalize="none"
                   autoCorrect="off"
                   spellCheck={false}
                   required
-                  className={CONTROL_CLASS}
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
                 />
@@ -150,7 +150,13 @@ export default function AdminLoginPage() {
 
               {error ? <Alert tone="danger">{error}</Alert> : null}
 
-              <Button type="submit" size="lg" fullWidth disabled={loading}>
+              <Button
+                type="submit"
+                size="lg"
+                fullWidth
+                suppressHydrationWarning
+                disabled={loading}
+              >
                 {loading ? "Memproses..." : "Masuk ke dashboard"}
               </Button>
             </form>
@@ -166,6 +172,7 @@ export default function AdminLoginPage() {
             <Button
               variant="ghost"
               size="sm"
+              suppressHydrationWarning
               onClick={() => {
                 void (async () => {
                   await logoutAdmin();

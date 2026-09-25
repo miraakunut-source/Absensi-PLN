@@ -147,9 +147,7 @@ function AbsenFormContent({ id }: { id: string }) {
           ) : null
         }
       />
-      <div className="mt-6">
-        <FormViewer config={config} disabled={!allowFill} />
-      </div>
+      <FormViewer config={config} disabled={!allowFill} />
     </div>
   );
 }

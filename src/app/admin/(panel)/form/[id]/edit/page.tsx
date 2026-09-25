@@ -10,6 +10,7 @@ import EmptyState from "@/components/ui/EmptyState";
 import Field, { ChoiceOption, CONTROL_CLASS_SM } from "@/components/ui/Field";
 import PageHeader from "@/components/ui/PageHeader";
 import QRCodeGenerator from "./QRCodeGenerator";
+import { createBlankForm } from "@/lib/defaultForm";
 import { getConfig, saveConfig } from "@/lib/formStorage";
 import type {
   FormConfig,
@@ -73,6 +74,7 @@ export default function EditFormPage({
   const [message, setMessage] = useState<string | null>(null);
   const [messageTone, setMessageTone] = useState<"info" | "error">("info");
   const [formUrl, setFormUrl] = useState("");
+  const [isDraft, setIsDraft] = useState(false);
   const [activePageId, setActivePageId] = useState<string | null>(null);
   const [printQr, setPrintQr] = useState(false);
 
@@ -81,10 +83,23 @@ export default function EditFormPage({
 
     (async () => {
       try {
-        const existing = await getConfig(formId);
+        const draftRequested =
+          new URLSearchParams(window.location.search).get("draft") === "1";
+        const existing = draftRequested ? null : await getConfig(formId);
         if (cancelled) return;
         if (!existing) {
-          setNotFound(true);
+          if (!draftRequested) {
+            setNotFound(true);
+            return;
+          }
+          const blank = createBlankForm({
+            id: formId,
+            title: "Kegiatan Absensi Baru",
+          });
+          setConfig(blank);
+          setIsDraft(true);
+          setActivePageId(blank.pages[0]?.id ?? null);
+          setFormUrl(`${window.location.origin}/absen/${blank.token}`);
           return;
         }
         setConfig(existing);
@@ -134,6 +149,8 @@ export default function EditFormPage({
       };
       await saveConfig(normalized);
       setConfig(normalized);
+      setIsDraft(false);
+      window.history.replaceState(null, "", window.location.pathname);
       setMessageTone("info");
       setMessage("Formulir berhasil disimpan.");
     } catch (error) {
@@ -164,9 +181,9 @@ export default function EditFormPage({
 
   if (loading) {
     return (
-      <div className="mx-auto w-full max-w-6xl px-4 py-16">
+      <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:py-8">
         <Card className="mx-auto max-w-xl">
-          <div className="type-body px-5 py-8 text-center text-muted" role="status">
+          <div className="type-body px-5 py-6 text-center text-muted" role="status">
             Memuat editor form...
           </div>
         </Card>
@@ -176,9 +193,10 @@ export default function EditFormPage({
 
   if (notFound || !config) {
     return (
-      <div className="mx-auto w-full max-w-6xl px-4 py-16">
+      <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:py-8">
         <Card className="mx-auto max-w-xl">
           <EmptyState
+            compact
             title="Form tidak ditemukan"
             description="Kegiatan dengan tautan ini tidak ada atau sudah dihapus. Kembali ke dashboard untuk memilih kegiatan lain."
             action={
@@ -336,6 +354,7 @@ export default function EditFormPage({
             </Button>
             <Button
               variant="secondary"
+              disabled={isDraft}
               onClick={() => {
                 window.open(previewUrl, "_blank", "noopener");
               }}
@@ -344,18 +363,28 @@ export default function EditFormPage({
             </Button>
             <Button
               variant="secondary"
+              disabled={isDraft}
               onClick={() => {
                 void copyLink();
               }}
             >
               Salin tautan
             </Button>
-            <Button onClick={handleSave} disabled={saving}>
+            <Button variant="accent" onClick={handleSave} disabled={saving}>
               {saving ? "Menyimpan..." : "Simpan formulir"}
             </Button>
           </>
         }
       />
+
+      {isDraft ? (
+        <Alert tone="warn" title="Formulir baru belum disimpan" className="mb-5">
+          Pengaturan di halaman ini hanya ada di peramban Anda. Tekan{" "}
+          <strong>Simpan formulir</strong> untuk menyimpannya ke database. Jika
+          Anda kembali ke dashboard tanpa menyimpan, formulir ini tidak akan
+          tersimpan dan tautan peserta belum bisa dibuka.
+        </Alert>
+      ) : null}
 
       {message ? (
         <Alert
@@ -515,23 +544,23 @@ export default function EditFormPage({
             </CardBody>
           </Card>
 
-          <Card>
-            <CardHeader
-              title="Halaman form"
-              actions={
-                <Button variant="secondary" size="sm" onClick={addPage}>
-                  Tambah halaman
-                </Button>
-              }
-            />
-            {activePage ? (
-              <>
-                <CardBody className="space-y-6">
-                  <div
-                    className="flex flex-wrap gap-2"
-                    role="group"
-                    aria-label="Pilih halaman form"
-                  >
+          {activePage ? (
+            <Card className="mt-4">
+              <CardHeader
+                title="Halaman form"
+                description="Atur judul, deskripsi, dan pilihan halaman isian."
+                actions={
+                  <Button variant="secondary" size="sm" onClick={addPage}>
+                    Tambah halaman
+                  </Button>
+                }
+              />
+              <CardBody className="space-y-5">
+                <div
+                  className="flex flex-wrap gap-2"
+                  role="group"
+                  aria-label="Pilih halaman form"
+                >
                     {config.pages.map((page, index) => {
                       const active = page.id === activePage.id;
                       return (
@@ -539,6 +568,7 @@ export default function EditFormPage({
                           key={page.id}
                           variant={active ? "primary" : "secondary"}
                           size="sm"
+                          className="min-w-0 max-w-full whitespace-normal break-words"
                           aria-pressed={active}
                           onClick={() => setActivePageId(page.id)}
                         >
@@ -546,44 +576,58 @@ export default function EditFormPage({
                         </Button>
                       );
                     })}
-                  </div>
+                </div>
 
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <Field
-                      label="Judul halaman"
-                      htmlFor={`page-title-${activePage.id}`}
-                    >
-                      <input
-                        id={`page-title-${activePage.id}`}
-                        type="text"
-                        className={CONTROL_CLASS_SM}
-                        value={activePage.title}
-                        onChange={(event) =>
-                          updatePage(activePage.id, {
-                            title: event.target.value,
-                          })
-                        }
-                      />
-                    </Field>
-                    <Field
-                      label="Deskripsi halaman (opsional)"
-                      htmlFor={`page-description-${activePage.id}`}
-                    >
-                      <input
-                        id={`page-description-${activePage.id}`}
-                        type="text"
-                        className={CONTROL_CLASS_SM}
-                        value={activePage.description ?? ""}
-                        onChange={(event) =>
-                          updatePage(activePage.id, {
-                            description: event.target.value,
-                          })
-                        }
-                      />
-                    </Field>
-                  </div>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <Field
+                    label="Judul halaman"
+                    htmlFor={`page-title-${activePage.id}`}
+                  >
+                    <input
+                      id={`page-title-${activePage.id}`}
+                      type="text"
+                      className={CONTROL_CLASS_SM}
+                      value={activePage.title}
+                      onChange={(event) =>
+                        updatePage(activePage.id, {
+                          title: event.target.value,
+                        })
+                      }
+                    />
+                  </Field>
+                  <Field
+                    label="Deskripsi halaman (opsional)"
+                    htmlFor={`page-description-${activePage.id}`}
+                  >
+                    <input
+                      id={`page-description-${activePage.id}`}
+                      type="text"
+                      className={CONTROL_CLASS_SM}
+                      value={activePage.description ?? ""}
+                      onChange={(event) =>
+                        updatePage(activePage.id, {
+                          description: event.target.value,
+                        })
+                      }
+                    />
+                  </Field>
+                </div>
+              </CardBody>
+            </Card>
+          ) : null}
 
-                  <div className="space-y-4">
+          {activePage ? (
+            <Card className="mt-4">
+              <CardHeader
+                title={`Pertanyaan pada halaman ${activePage.title}`}
+                description="Urutan pertanyaan mengikuti urutan di bawah."
+                actions={
+                  <Button size="sm" onClick={addQuestion}>
+                    Tambah pertanyaan
+                  </Button>
+                }
+              />
+              <CardBody className="space-y-4">
                     {activeQuestions.length === 0 ? (
                       <EmptyState
                         compact
@@ -789,29 +833,22 @@ export default function EditFormPage({
                         );
                       })
                     )}
-                  </div>
-                </CardBody>
-                <CardFooter className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                  <p className="type-body text-muted">
-                    {activeQuestions.length} pertanyaan di halaman ini
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    <Button
-                      variant="danger"
-                      onClick={() => deletePage(activePage.id)}
-                    >
-                      Hapus halaman ini
-                    </Button>
-                    {activeQuestions.length > 0 ? (
-                      <Button onClick={addQuestion}>
-                        Tambah pertanyaan
-                      </Button>
-                    ) : null}
-                  </div>
-                </CardFooter>
-              </>
-            ) : null}
-          </Card>
+              </CardBody>
+              <CardFooter className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <p className="type-body text-muted">
+                  {activeQuestions.length} pertanyaan di halaman ini
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    variant="danger"
+                    onClick={() => deletePage(activePage.id)}
+                  >
+                    Hapus halaman ini
+                  </Button>
+                </div>
+              </CardFooter>
+            </Card>
+          ) : null}
         </div>
 
         <aside className="space-y-6">
@@ -821,44 +858,61 @@ export default function EditFormPage({
               description="QR unik untuk kegiatan ini. Peserta memindai QR untuk membuka form tanpa login."
             />
             <CardBody>
-              {formUrl ? <QRCodeGenerator value={formUrl} /> : null}
-              <Button
-                variant="secondary"
-                fullWidth
-                className="mt-4"
-                onClick={() => setPrintQr(true)}
-              >
-                Cetak QR Code
-              </Button>
+              {isDraft ? (
+                <Alert tone="warn">
+                  QR Code baru bisa dibuat setelah formulir disimpan. Tekan
+                  Simpan formulir terlebih dahulu.
+                </Alert>
+              ) : (
+                <>
+                  {formUrl ? <QRCodeGenerator value={formUrl} /> : null}
+                  <Button
+                    variant="secondary"
+                    fullWidth
+                    className="mt-4"
+                    onClick={() => setPrintQr(true)}
+                  >
+                    Cetak QR Code
+                  </Button>
+                </>
+              )}
             </CardBody>
           </Card>
 
           <Card>
             <CardHeader title="Tautan peserta" />
             <CardBody>
-              <p className="type-caption break-all rounded-md bg-sunken p-4 font-mono text-brand-800">
-                {formUrl}
-              </p>
-              <div className="mt-4 flex flex-col gap-2">
-                <Button
-                  variant="secondary"
-                  fullWidth
-                  onClick={() => {
-                    void copyLink();
-                  }}
-                >
-                  Salin tautan
-                </Button>
-                <Button
-                  variant="secondary"
-                  fullWidth
-                  onClick={() => {
-                    window.open(previewUrl, "_blank", "noopener");
-                  }}
-                >
-                  Buka pratinjau
-                </Button>
-              </div>
+              {isDraft ? (
+                <Alert tone="warn">
+                  Tautan peserta baru aktif setelah formulir disimpan.
+                </Alert>
+              ) : (
+                <>
+                  <p className="type-caption break-all rounded-md bg-sunken p-4 font-mono text-brand-800">
+                    {formUrl}
+                  </p>
+                  <div className="mt-4 flex flex-col gap-2">
+                    <Button
+                      variant="secondary"
+                      fullWidth
+                      onClick={() => {
+                        void copyLink();
+                      }}
+                    >
+                      Salin tautan
+                    </Button>
+                    <Button
+                      variant="secondary"
+                      fullWidth
+                      onClick={() => {
+                        window.open(previewUrl, "_blank", "noopener");
+                      }}
+                    >
+                      Buka pratinjau
+                    </Button>
+                  </div>
+                </>
+              )}
             </CardBody>
           </Card>
         </aside>
@@ -870,7 +924,7 @@ export default function EditFormPage({
             role="dialog"
             aria-modal="true"
             aria-labelledby="print-qr-title"
-            className="max-h-[90vh] w-full max-w-sm overflow-auto rounded-xl border border-line bg-surface p-6 print:max-w-none print:rounded-none print:border-0 print:p-0"
+            className="max-h-[90vh] w-full max-w-sm overflow-auto rounded-xl border border-line bg-surface p-6 shadow-lift print:max-w-none print:rounded-none print:border-0 print:p-0 print:shadow-none"
           >
             <div className="mb-4 flex items-center justify-between gap-3 print:hidden">
               <p id="print-qr-title" className="type-heading">

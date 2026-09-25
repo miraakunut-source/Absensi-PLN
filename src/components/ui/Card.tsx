@@ -18,7 +18,11 @@ export default function Card({
   tone = "surface",
 }: CardProps) {
   return (
-    <div className={`rounded-lg ${TONES[tone]} ${className ?? ""}`}>
+    <div
+      className={`rounded-lg shadow-panel print:shadow-none ${TONES[tone]} ${
+        className ?? ""
+      }`}
+    >
       {children}
     </div>
   );

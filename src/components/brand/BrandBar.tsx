@@ -21,7 +21,7 @@ export default function BrandBar({
       >
         <PlnMark inverted />
         {trailing ? (
-          <div className="flex flex-wrap items-center gap-1">{trailing}</div>
+          <div className="ml-auto flex flex-wrap items-center gap-1">{trailing}</div>
         ) : null}
         {children}
       </div>

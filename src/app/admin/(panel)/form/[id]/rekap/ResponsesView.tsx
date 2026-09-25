@@ -142,7 +142,7 @@ export default function ResponsesView({ formId }: ResponsesViewProps) {
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-6xl px-4 py-16 text-center">
+      <div className="mx-auto max-w-6xl px-4 py-6 text-center sm:py-8">
         <p className="type-body text-muted">Memuat rekap absensi...</p>
       </div>
     );
@@ -150,7 +150,7 @@ export default function ResponsesView({ formId }: ResponsesViewProps) {
 
   if (error) {
     return (
-      <div className="mx-auto max-w-6xl px-4 py-16">
+      <div className="mx-auto max-w-6xl px-4 py-6 sm:py-8">
         <Alert tone="danger">{error}</Alert>
         <div className="mt-5">
           <Button href="/admin/dashboard" variant="secondary">
@@ -163,9 +163,10 @@ export default function ResponsesView({ formId }: ResponsesViewProps) {
 
   if (!config) {
     return (
-      <div className="mx-auto max-w-6xl px-4 py-16">
+      <div className="mx-auto max-w-6xl px-4 py-6 sm:py-8">
         <Card>
           <EmptyState
+            compact
             title="Form tidak ditemukan"
             description="Kegiatan mungkin sudah dihapus. Kembali ke dashboard untuk memilih kegiatan lain."
             action={
@@ -190,6 +191,7 @@ export default function ResponsesView({ formId }: ResponsesViewProps) {
         day: "numeric",
         month: "long",
         year: "numeric",
+        timeZone: "Asia/Jakarta",
       })
     : "tanggal belum diatur";
 
@@ -302,7 +304,7 @@ export default function ResponsesView({ formId }: ResponsesViewProps) {
                   return (
                     <CardFooter key={`detail-${row.id}`} className="bg-sunken">
                       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-                        <h3 className="type-heading">
+                        <h3 className="type-heading min-w-0 break-words">
                           Detail jawaban: {respondentName(row)}
                         </h3>
                         <Button
@@ -320,8 +322,10 @@ export default function ResponsesView({ formId }: ResponsesViewProps) {
                               key={column.id}
                               className="grid gap-1 sm:grid-cols-[180px_1fr] sm:gap-3"
                             >
-                              <dt className="type-label">{column.label}</dt>
-                              <dd className="type-body">
+                              <dt className="type-label break-words">
+                                {column.label}
+                              </dt>
+                              <dd className="type-body min-w-0 break-words">
                                 {displayValue(
                                   column,
                                   row.answers[column.id],
@@ -330,14 +334,14 @@ export default function ResponsesView({ formId }: ResponsesViewProps) {
                             </div>
                           ))}
                         </dl>
-                        <div className="rounded-lg border border-line bg-surface p-3 text-center">
+                        <div className="rounded-lg border border-line bg-surface p-3 text-center shadow-panel">
                           <p className="type-label mb-2">Tanda tangan</p>
                           {signature ? (
                             // eslint-disable-next-line @next/next/no-img-element
                             <img
                               src={signature}
                               alt={`Tanda tangan ${respondentName(row)}`}
-                              className="mx-auto max-h-32 w-auto object-contain"
+                              className="mx-auto max-h-32 max-w-full w-auto object-contain"
                             />
                           ) : (
                             <p className="type-caption">-</p>
@@ -352,15 +356,15 @@ export default function ResponsesView({ formId }: ResponsesViewProps) {
       )}
 
       <section className="print-area mx-auto max-w-[210mm] border border-line bg-white p-6 text-black print:max-w-none print:border-0 print:p-0 print:shadow-none">
-        <header className="mb-6 flex items-center gap-4 border-b-4 border-double border-black pb-4">
+        <header className="mb-6 flex items-center gap-3 border-b-4 border-double border-black pb-4 sm:gap-4">
           <Image
             src="/logo-pln.png"
             alt="Logo PLN"
             width={64}
             height={64}
-            className="h-16 w-16 shrink-0 print:print-color-adjust-exact"
+            className="h-12 w-12 shrink-0 print:print-color-adjust-exact sm:h-16 sm:w-16"
           />
-          <div className="flex-1 text-center text-black">
+          <div className="min-w-0 flex-1 text-center text-black">
             <p className="text-[11px] font-semibold uppercase tracking-[0.35em]">
               PT PLN (PERSERO)
             </p>
@@ -372,14 +376,16 @@ export default function ResponsesView({ formId }: ResponsesViewProps) {
             </p>
             <p className="text-[10px] leading-tight">www.pln.co.id</p>
           </div>
-          <div className="h-16 w-16 shrink-0" aria-hidden />
+          <div className="h-12 w-12 shrink-0 sm:h-16 sm:w-16" aria-hidden />
         </header>
 
         <div className="mb-6 text-center text-black">
           <h3 className="text-base font-bold uppercase tracking-wide text-black">
             Laporan Absensi Kegiatan
           </h3>
-          <p className="mt-1 text-sm font-semibold">{config.title}</p>
+          <p className="mt-1 text-sm font-semibold break-words">
+            {config.title}
+          </p>
           <p className="text-sm">Tanggal Kegiatan: {eventLabel}</p>
           <p className="text-xs text-black">
             Periode pengisian: {period}

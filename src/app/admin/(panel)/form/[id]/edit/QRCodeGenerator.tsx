@@ -27,7 +27,7 @@ export default function QRCodeGenerator({
 
   return (
     <div className="flex flex-col items-center gap-4">
-      <div className="rounded-md border border-line bg-surface p-4">
+      <div className="rounded-md border border-line bg-surface p-4 shadow-panel">
         <QRCodeCanvas
           ref={canvasRef}
           value={value}

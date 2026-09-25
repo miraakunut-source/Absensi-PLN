@@ -36,6 +36,7 @@ interface CommonProps {
   size?: ButtonSize;
   fullWidth?: boolean;
   className?: string;
+  suppressHydrationWarning?: boolean;
   children: ReactNode;
 }
 

@@ -20,7 +20,7 @@ export default function PageHeader({
       }`}
     >
       <div className="min-w-0">
-        <h1 className="type-display">{title}</h1>
+        <h1 className="type-display break-words">{title}</h1>
         {description ? (
           <div className="type-body mt-2 max-w-2xl text-muted">
             {description}
@@ -28,7 +28,7 @@ export default function PageHeader({
         ) : null}
       </div>
       {actions ? (
-        <div className="flex shrink-0 flex-wrap gap-2">{actions}</div>
+        <div className="flex min-w-0 max-w-full flex-wrap gap-2">{actions}</div>
       ) : null}
     </div>
   );

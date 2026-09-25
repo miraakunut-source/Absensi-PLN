@@ -286,17 +286,15 @@ export default function FormViewer({ config, disabled }: FormViewerProps) {
 
   if (submitted) {
     return (
-      <Card className="border-l-4 border-l-success-700 p-6 sm:p-8">
+      <div className="space-y-5">
         <Alert tone="success" title="Absensi terkirim">
           {config.confirmationMessage ||
             "Terima kasih. Data absensi Anda sudah diterima panitia."}
         </Alert>
-        <div className="mt-6">
-          <Button variant="secondary" onClick={resetForm} fullWidth>
-            Isi absensi lagi
-          </Button>
-        </div>
-      </Card>
+        <Button variant="secondary" onClick={resetForm} fullWidth>
+          Isi absensi lagi
+        </Button>
+      </div>
     );
   }
 
@@ -311,8 +309,8 @@ export default function FormViewer({ config, disabled }: FormViewerProps) {
 
   return (
     <Card className="p-5 sm:p-7">
-      <div className="border-b border-line pb-5">
-        <h2 className="type-title">{currentPage.title}</h2>
+      <div className="border-b border-line pb-4">
+        <h2 className="type-title break-words">{currentPage.title}</h2>
         {currentPage.description ? (
           <p className="type-body mt-2 text-muted">{currentPage.description}</p>
         ) : null}
@@ -321,7 +319,7 @@ export default function FormViewer({ config, disabled }: FormViewerProps) {
         </div>
       </div>
 
-      <div className="space-y-7 pt-6">
+      <div className="space-y-7 pt-5">
         {pageQuestions.map((question) => {
           const message = validateQuestion(
             question,
@@ -350,7 +348,7 @@ export default function FormViewer({ config, disabled }: FormViewerProps) {
         })}
 
         {isLastPage ? (
-          <div className="rounded-lg border border-line bg-sunken p-4 sm:p-5">
+          <div className="rounded-lg border border-line bg-sunken p-4 shadow-panel sm:p-5">
             <p className="type-heading">
               Tanda tangan
               <span className="ml-1 text-danger-600" aria-hidden>
@@ -378,7 +376,7 @@ export default function FormViewer({ config, disabled }: FormViewerProps) {
         </Alert>
       ) : null}
 
-      <div className="mt-7 flex flex-col gap-3 border-t border-line pt-5 sm:flex-row sm:items-center sm:justify-between">
+      <div className="mt-5 flex flex-col gap-3 border-t border-line pt-5 sm:flex-row sm:items-center sm:justify-between">
         <Button
           variant="secondary"
           onClick={goPrev}

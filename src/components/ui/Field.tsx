@@ -27,7 +27,7 @@ export default function Field({
 }: FieldProps) {
   return (
     <div className={className}>
-      <label htmlFor={htmlFor} className="type-label mb-1.5 block">
+      <label htmlFor={htmlFor} className="type-label mb-1.5 block break-words">
         {label}
         {required ? (
           <span className="ml-1 text-danger-600" aria-hidden>
@@ -81,7 +81,7 @@ export function ChoiceOption({
         onChange={onChange}
         className="mt-0.5 h-4 w-4 shrink-0 border-line-strong accent-brand-600"
       />
-      <span className="min-w-0">{children}</span>
+      <span className="min-w-0 break-words">{children}</span>
     </label>
   );
 }

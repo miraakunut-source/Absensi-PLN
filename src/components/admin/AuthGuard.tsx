@@ -11,7 +11,7 @@ interface AuthGuardProps {
 
 function GuardMessage({ children }: { children: ReactNode }) {
   return (
-    <div className="mx-auto flex min-h-[40vh] max-w-2xl items-center justify-center px-4">
+    <div className="mx-auto flex max-w-2xl items-center justify-center px-4 py-16">
       <p className="type-body text-muted">{children}</p>
     </div>
   );

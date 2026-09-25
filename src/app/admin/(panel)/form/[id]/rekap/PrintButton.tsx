@@ -1,9 +1,11 @@
 "use client";
 
+import Button from "@/components/ui/Button";
+
 export default function PrintButton() {
   return (
-    <button type="button" onClick={() => window.print()} className="btn btn-primary">
+    <Button onClick={() => window.print()}>
       Cetak atau simpan PDF
-    </button>
+    </Button>
   );
 }

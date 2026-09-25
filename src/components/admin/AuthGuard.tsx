@@ -2,10 +2,19 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
+import Alert from "@/components/ui/Alert";
 import { isFirebaseConfigured, watchAdmin } from "@/lib/firebase";
 
 interface AuthGuardProps {
   children: ReactNode;
+}
+
+function GuardMessage({ children }: { children: ReactNode }) {
+  return (
+    <div className="mx-auto flex min-h-[40vh] max-w-2xl items-center justify-center px-4">
+      <p className="type-body text-muted">{children}</p>
+    </div>
+  );
 }
 
 export default function AuthGuard({ children }: AuthGuardProps) {
@@ -32,30 +41,24 @@ export default function AuthGuard({ children }: AuthGuardProps) {
   }, [router, pathname]);
 
   if (status === "loading") {
-    return (
-      <div className="flex min-h-[40vh] items-center justify-center px-4 text-sm text-slate-600">
-        Memeriksa sesi admin...
-      </div>
-    );
+    return <GuardMessage>Memeriksa sesi admin...</GuardMessage>;
   }
 
   if (status === "guest") {
-    return (
-      <div className="flex min-h-[40vh] items-center justify-center px-4 text-sm text-slate-600">
-        Mengalihkan ke halaman login...
-      </div>
-    );
+    return <GuardMessage>Mengalihkan ke halaman login...</GuardMessage>;
   }
 
   return (
     <>
       {status === "dev" ? (
-        <div className="border-b border-amber-200 bg-amber-50 px-4 py-2 text-center text-xs text-amber-900">
-          Mode pengembangan: Firebase Auth belum dikonfigurasi, sehingga admin
-          terbuka tanpa login. Isi{" "}
-          <code className="font-semibold">NEXT_PUBLIC_FIREBASE_*</code> di{" "}
-          <code className="font-semibold">.env.local</code> sebelum digunakan di
-          produksi.
+        <div className="px-4 pt-4">
+          <div className="mx-auto max-w-6xl">
+            <Alert tone="warn" title="Mode pengembangan">
+              Firebase Auth belum dikonfigurasi sehingga halaman admin terbuka
+              tanpa login. Isi <code>NEXT_PUBLIC_FIREBASE_*</code> di{" "}
+              <code>.env.local</code> sebelum dipakai di produksi.
+            </Alert>
+          </div>
         </div>
       ) : null}
       {children}

@@ -26,23 +26,17 @@ export default function EventHeader({
   note,
 }: EventHeaderProps) {
   return (
-    <div className="mb-5">
-      <p className="text-sm font-semibold text-brand-700">Formulir absensi</p>
-      <h1 className="mt-1 text-2xl font-bold leading-snug tracking-tight text-ink sm:text-3xl">
-        {title}
-      </h1>
+    <div className="border-b border-line pb-6">
+      <p className="type-caption text-brand-700">Formulir absensi kegiatan</p>
+      <h1 className="type-display mt-2">{title}</h1>
       {eventDate ? (
-        <p className="mt-2 text-sm text-slate-600">
-          Tanggal kegiatan:{" "}
-          <span className="font-semibold text-slate-800">
-            {formatDate(eventDate)}
-          </span>
+        <p className="type-body mt-3 text-muted">
+          <span className="font-semibold text-body">Tanggal kegiatan:</span>{" "}
+          {formatDate(eventDate)}
         </p>
       ) : null}
       {description ? (
-        <p className="mt-3 text-sm leading-relaxed text-slate-600">
-          {description}
-        </p>
+        <p className="type-body mt-3 text-muted">{description}</p>
       ) : null}
       {note ? <div className="mt-4">{note}</div> : null}
     </div>

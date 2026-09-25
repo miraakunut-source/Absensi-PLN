@@ -3,6 +3,12 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import Alert from "@/components/ui/Alert";
+import Badge from "@/components/ui/Badge";
+import Button from "@/components/ui/Button";
+import Card, { CardHeader } from "@/components/ui/Card";
+import EmptyState from "@/components/ui/EmptyState";
+import PageHeader from "@/components/ui/PageHeader";
 import { countResponses, deleteForm, listForms } from "@/lib/formStorage";
 import { getFormOpenState, getOpenStateMessage } from "@/lib/formStatus";
 import type { FormConfig } from "@/types";
@@ -20,6 +26,16 @@ function formatEventDate(value?: string | null): string {
       day: "numeric",
       month: "long",
       year: "numeric",
+      timeZone: "Asia/Jakarta",
+    });
+  } catch {
+    return value;
+  }
+}
+
+function formatDeadline(value: string): string {
+  try {
+    return new Date(value).toLocaleString("id-ID", {
       timeZone: "Asia/Jakarta",
     });
   } catch {
@@ -94,7 +110,7 @@ export default function AdminDashboardPage() {
       setError(
         createError instanceof Error
           ? createError.message
-          : "Gagal membuat form baru. Coba lagi.",
+          : "Kegiatan gagal dibuat. Coba lagi.",
       );
       setBusyId(null);
     }
@@ -158,7 +174,7 @@ export default function AdminDashboardPage() {
       label: "Total kegiatan",
       value: stats.totalForms,
       hint: "semua form absensi",
-      accent: "border-l-slate-400",
+      accent: "border-l-line-strong",
       valueClass: "text-ink",
     },
     {
@@ -172,176 +188,159 @@ export default function AdminDashboardPage() {
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:py-8">
-      <div className="mb-6 flex flex-col gap-4 border-b border-slate-200 pb-6 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="page-title">Dashboard absensi</h1>
-          <p className="page-subtitle">
-            Ringkasan kegiatan, jumlah peserta, dan kontrol buka atau tutup form
-            peserta.
-          </p>
-        </div>
-        <button
-          type="button"
-          onClick={() => {
-            void handleCreate();
-          }}
-          disabled={busyId === "new"}
-          className="btn btn-primary sm:w-auto"
-        >
-          {busyId === "new" ? "Membuat form..." : "Buat kegiatan baru"}
-        </button>
-      </div>
+      <PageHeader
+        title="Dashboard absensi"
+        description="Ringkasan kegiatan, jumlah peserta, serta kontrol buka dan tutup absensi peserta."
+        actions={
+          <Button
+            size="lg"
+            onClick={() => {
+              void handleCreate();
+            }}
+            disabled={busyId === "new"}
+          >
+            {busyId === "new" ? "Membuat kegiatan..." : "Buat kegiatan baru"}
+          </Button>
+        }
+      />
 
       <div className="mb-6 grid gap-3 sm:grid-cols-3">
         {statItems.map((item) => (
-          <div
+          <Card
             key={item.label}
-            className={`panel border-l-4 rounded-r-xl p-5 ${item.accent}`}
+            className={`border-l-4 ${item.accent} px-5 py-4`}
           >
-            <p className="text-sm font-medium text-slate-600">{item.label}</p>
+            <p className="type-caption">{item.label}</p>
             <p
-              className={`mt-2 text-3xl font-extrabold tracking-tight ${item.valueClass}`}
+              className={`mt-1 text-3xl font-extrabold tracking-tight ${item.valueClass}`}
             >
               {item.value}
             </p>
-            <p className="mt-1 text-xs text-slate-500">{item.hint}</p>
-          </div>
+            <p className="type-caption mt-1">{item.hint}</p>
+          </Card>
         ))}
       </div>
 
       {error ? (
-        <div className="alert-error mb-5" role="alert">
+        <Alert tone="danger" className="mb-5">
           {error}
-        </div>
+        </Alert>
       ) : null}
 
-      <section className="panel overflow-hidden rounded-xl">
-        <div className="border-b border-slate-200 px-5 py-4">
-          <h2 className="panel-title">Daftar kegiatan</h2>
-          <p className="mt-1 text-sm text-slate-600">
-            Edit pertanyaan, buka tautan peserta, atau tutup absensi ketika
-            kegiatan selesai.
-          </p>
-        </div>
+      <Card tone="transparent" className="border border-line">
+        <CardHeader
+          title="Daftar kegiatan"
+          description="Edit pertanyaan, buka tautan peserta, atau tutup absensi saat kegiatan selesai."
+        />
 
         {loading ? (
-          <div className="space-y-3 px-5 py-8" aria-busy="true">
-            <div className="h-16 animate-pulse rounded-lg bg-slate-100" />
-            <div className="h-16 animate-pulse rounded-lg bg-slate-100" />
-            <div className="h-16 animate-pulse rounded-lg bg-slate-100" />
-            <p className="text-sm text-slate-500">Memuat kegiatan...</p>
+          <div className="space-y-3 px-5 py-6" aria-busy="true">
+            <div className="h-16 animate-pulse rounded-md bg-sunken" />
+            <div className="h-16 animate-pulse rounded-md bg-sunken" />
+            <div className="h-16 animate-pulse rounded-md bg-sunken" />
+            <p className="type-caption">Memuat kegiatan...</p>
           </div>
         ) : forms.length === 0 ? (
-          <div className="px-5 py-12 text-center">
-            <p className="text-base font-bold text-ink">Belum ada kegiatan</p>
-            <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-slate-600">
-              Klik &quot;Buat kegiatan baru&quot; untuk membuat form absensi,
-              lalu bagikan QR Code kepada peserta.
-            </p>
-            <button
-              type="button"
-              onClick={() => {
-                void handleCreate();
-              }}
-              disabled={busyId === "new"}
-              className="btn btn-primary mt-5"
-            >
-              Buat kegiatan baru
-            </button>
-          </div>
+          <EmptyState
+            title="Belum ada kegiatan"
+            description="Buat kegiatan baru untuk menyiapkan form absensi, lalu bagikan QR Code kepada peserta."
+            action={
+              <Button
+                onClick={() => {
+                  void handleCreate();
+                }}
+                disabled={busyId === "new"}
+              >
+                Buat kegiatan baru
+              </Button>
+            }
+          />
         ) : (
-          <ul className="divide-y divide-slate-100">
+          <ul className="divide-y divide-line">
             {forms.map((form) => {
               const count = counts[form.id] ?? 0;
               const state = getFormOpenState(form, count);
               const open = state === "open";
+              const busy = busyId === form.id;
               return (
                 <li
                   key={form.id}
-                  className="flex flex-col gap-4 px-5 py-5 sm:flex-row sm:items-start sm:justify-between"
+                  className="flex flex-col gap-4 px-5 py-5 lg:flex-row lg:items-start lg:justify-between"
                 >
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <p className="text-base font-bold text-ink">
-                        {form.title}
-                      </p>
-                      <span
-                        className={`status-pill ${
-                          open
-                            ? "bg-emerald-50 text-emerald-800"
-                            : "bg-slate-100 text-slate-700"
-                        }`}
-                      >
-                        {open
-                          ? "Dibuka"
-                          : getOpenStateMessage(state) || "Ditutup"}
-                      </span>
+                      <p className="type-heading">{form.title}</p>
+                      <Badge tone={open ? "success" : "neutral"}>
+                        {open ? "Dibuka" : getOpenStateMessage(state) || "Ditutup"}
+                      </Badge>
                     </div>
-                    <div className="mt-2 flex flex-wrap gap-x-5 gap-y-1 text-sm text-slate-600">
-                      <span>{formatEventDate(form.eventDate)}</span>
-                      <span className="font-semibold text-slate-800">
+                    <div className="mt-2 flex flex-wrap gap-x-5 gap-y-1">
+                      <span className="type-caption">
+                        {formatEventDate(form.eventDate)}
+                      </span>
+                      <span className="type-caption font-semibold text-ink">
                         {count} peserta
                       </span>
-                      <span>
+                      <span className="type-caption">
                         {form.closesAt
-                          ? `Batas waktu: ${new Date(form.closesAt).toLocaleString("id-ID", { timeZone: "Asia/Jakarta" })}`
+                          ? `Batas waktu ${formatDeadline(form.closesAt)}`
                           : "Tanpa batas waktu otomatis"}
                       </span>
                     </div>
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    <Link
+                    <Button
                       href={`/admin/form/${encodeURIComponent(form.id)}/edit`}
-                      className="btn btn-secondary btn-sm"
+                      variant="secondary"
+                      size="sm"
                     >
                       Edit form
-                    </Link>
-                    <Link
+                    </Button>
+                    <Button
                       href={`/admin/form/${encodeURIComponent(form.id)}/rekap`}
-                      className="btn btn-secondary btn-sm"
+                      variant="secondary"
+                      size="sm"
                     >
-                      Peserta ({count})
-                    </Link>
+                      Rekap ({count})
+                    </Button>
                     <Link
                       href={`/absen/${encodeURIComponent(form.token)}?preview=1`}
                       target="_blank"
-                      className="btn btn-secondary btn-sm"
+                      className="inline-flex min-h-9 items-center rounded-lg border border-line-strong bg-surface px-3 text-xs font-semibold text-ink transition-colors hover:bg-sunken focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600"
                     >
                       Pratinjau
                     </Link>
-                    <button
-                      type="button"
-                      disabled={busyId === form.id}
+                    <Button
+                      variant={open ? "accent" : "primary"}
+                      size="sm"
+                      disabled={busy}
                       onClick={() => {
                         void toggleStatus(form);
                       }}
-                      className={`btn btn-sm ${
-                        open ? "btn-gold" : "btn-primary"
-                      }`}
                     >
-                      {busyId === form.id
+                      {busy
                         ? "Memproses..."
                         : open
                           ? "Tutup absensi"
                           : "Buka absensi"}
-                    </button>
-                    <button
-                      type="button"
-                      disabled={busyId === form.id}
+                    </Button>
+                    <Button
+                      variant="danger"
+                      size="sm"
+                      disabled={busy}
                       onClick={() => {
                         void handleDelete(form);
                       }}
-                      className="btn btn-danger btn-sm"
                     >
                       Hapus
-                    </button>
+                    </Button>
                   </div>
                 </li>
               );
             })}
           </ul>
         )}
-      </section>
+      </Card>
     </div>
   );
 }

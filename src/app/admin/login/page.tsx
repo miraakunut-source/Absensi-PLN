@@ -3,7 +3,11 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useRef, useState } from "react";
-import PlnMark from "@/components/brand/PlnMark";
+import BrandBar from "@/components/brand/BrandBar";
+import Alert from "@/components/ui/Alert";
+import Button from "@/components/ui/Button";
+import Card from "@/components/ui/Card";
+import Field, { CONTROL_CLASS } from "@/components/ui/Field";
 import {
   isFirebaseConfigured,
   loginAdmin,
@@ -99,28 +103,20 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <main className="flex min-h-screen flex-col bg-slate-100">
-      <header className="border-b-4 border-gold-500 bg-brand-800">
-        <div className="mx-auto w-full max-w-md px-4 py-4">
-          <PlnMark inverted />
-        </div>
-      </header>
+    <div className="flex min-h-dvh flex-col bg-canvas">
+      <BrandBar />
 
-      <div className="flex flex-1 items-center justify-center px-4 py-10">
+      <main className="flex flex-1 items-center justify-center px-4 py-10">
         <div className="w-full max-w-md">
-          <div className="panel rounded-xl p-6 sm:p-8">
-            <h1 className="page-title text-xl sm:text-2xl">Masuk admin</h1>
-            <p className="page-subtitle">
-              Dashboard dilindungi Firebase Auth. Gunakan akun email admin yang
-              terdaftar. Peserta tidak login di sini — peserta cukup memindai QR
-              kegiatan.
-            </p>
+          <h1 className="type-display">Masuk admin</h1>
+          <p className="type-body mt-2 text-muted">
+            Gunakan akun admin yang terdaftar di Firebase Authentication. Peserta
+            tidak perlu login untuk mengisi absensi.
+          </p>
 
-            <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-              <div>
-                <label htmlFor="email" className="field-label">
-                  Email
-                </label>
+          <Card className="mt-6 p-6">
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <Field label="Email" htmlFor="email">
                 <input
                   id="email"
                   type="email"
@@ -130,16 +126,14 @@ export default function AdminLoginPage() {
                   autoCorrect="off"
                   spellCheck={false}
                   required
-                  className="field"
+                  className={CONTROL_CLASS}
                   placeholder="admin@plnup3kediri.id"
                   value={email}
                   onChange={(event) => setEmail(event.target.value)}
                 />
-              </div>
-              <div>
-                <label htmlFor="password" className="field-label">
-                  Password
-                </label>
+              </Field>
+
+              <Field label="Password" htmlFor="password">
                 <input
                   id="password"
                   type="password"
@@ -148,50 +142,42 @@ export default function AdminLoginPage() {
                   autoCorrect="off"
                   spellCheck={false}
                   required
-                  className="field"
+                  className={CONTROL_CLASS}
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
                 />
-              </div>
+              </Field>
 
-              {error ? (
-                <div className="alert-error" role="alert">
-                  {error}
-                </div>
-              ) : null}
+              {error ? <Alert tone="danger">{error}</Alert> : null}
 
-              <button
-                type="submit"
-                disabled={loading}
-                className="btn btn-primary w-full"
-              >
+              <Button type="submit" size="lg" fullWidth disabled={loading}>
                 {loading ? "Memproses..." : "Masuk ke dashboard"}
-              </button>
+              </Button>
             </form>
-          </div>
+          </Card>
 
-          <div className="mt-5 flex flex-wrap items-center justify-between gap-3 text-sm">
+          <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
             <Link
               href="/"
-              className="font-semibold text-brand-700 hover:text-brand-800"
+              className="text-sm font-semibold text-brand-700 hover:text-brand-800"
             >
               Kembali ke beranda
             </Link>
-            <button
-              type="button"
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={() => {
                 void (async () => {
                   await logoutAdmin();
                   await fetch("/api/admin/session", { method: "DELETE" });
                 })();
               }}
-              className="text-slate-500 underline underline-offset-2 hover:text-slate-700"
             >
-              Keluar dari sesi aktif (jika ada)
-            </button>
+              Keluar dari sesi aktif
+            </Button>
           </div>
         </div>
-      </div>
-    </main>
+      </main>
+    </div>
   );
 }

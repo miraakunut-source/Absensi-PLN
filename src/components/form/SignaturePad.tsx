@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import Button from "@/components/ui/Button";
 
 interface SignaturePadProps {
   onChange?: (dataUrl: string | null) => void;
@@ -60,8 +61,8 @@ export default function SignaturePad({
     };
 
     const styleStroke = () => {
-      ctx.strokeStyle = "#0c1a2b";
-      ctx.lineWidth = 1.8;
+      ctx.strokeStyle = "#0b1a2b";
+      ctx.lineWidth = 2.2;
       ctx.lineCap = "round";
       ctx.lineJoin = "round";
     };
@@ -72,7 +73,7 @@ export default function SignaturePad({
       try {
         canvas.setPointerCapture(event.pointerId);
       } catch {
-        /* pointer capture opsional */
+        // pointer capture opsional
       }
       styleStroke();
       const { x, y } = point(event);
@@ -98,7 +99,7 @@ export default function SignaturePad({
           canvas.releasePointerCapture(event.pointerId);
         }
       } catch {
-        /* release opsional */
+        // release pointer capture opsional
       }
       onChangeRef.current?.(
         hasStrokeRef.current ? canvas.toDataURL("image/png") : null,
@@ -137,24 +138,21 @@ export default function SignaturePad({
   };
 
   return (
-    <div className={`w-full ${className}`}>
+    <div className={className}>
       <div
         ref={containerRef}
-        className="touch-none h-48 w-full overflow-hidden rounded-lg border border-slate-300 bg-white"
+        className="h-52 w-full touch-none overflow-hidden rounded-lg border border-line-strong bg-surface"
       >
         <canvas ref={canvasRef} className="block h-full w-full touch-none" />
       </div>
-      <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
-        <p className="text-xs text-slate-500">
-          Gunakan jari di HP atau mouse di PC untuk menandatangani.
+      <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <p className="type-caption">
+          Gunakan jari di HP atau mouse di PC. Tanda tangan harus melewati
+          garis bawah.
         </p>
-        <button
-          type="button"
-          onClick={clear}
-          className="btn btn-secondary btn-sm"
-        >
+        <Button variant="secondary" size="sm" onClick={clear}>
           Hapus tanda tangan
-        </button>
+        </Button>
       </div>
     </div>
   );

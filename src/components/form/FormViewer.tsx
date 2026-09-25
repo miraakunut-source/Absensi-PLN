@@ -2,12 +2,17 @@
 
 import dynamic from "next/dynamic";
 import { useMemo, useState } from "react";
+import Alert from "@/components/ui/Alert";
+import Button from "@/components/ui/Button";
+import Card from "@/components/ui/Card";
+import Field, { ChoiceOption, CONTROL_CLASS } from "@/components/ui/Field";
+import ProgressSteps from "@/components/ui/ProgressSteps";
 import type { FormConfig, Question } from "@/types";
 
 const SignaturePad = dynamic(() => import("./SignaturePad"), {
   ssr: false,
   loading: () => (
-    <div className="h-48 w-full animate-pulse rounded-lg border border-dashed border-slate-300 bg-slate-50" />
+    <div className="h-48 w-full animate-pulse rounded-lg border border-dashed border-line-strong bg-sunken" />
   ),
 });
 
@@ -60,12 +65,13 @@ function QuestionField({
   const options = (question.options ?? []).filter(
     (option) => option.trim() !== "",
   );
+  const groupId = `${question.id}-group`;
 
   if (question.type === "textarea") {
     return (
       <textarea
         id={question.id}
-        className="field min-h-32 resize-y"
+        className={`${CONTROL_CLASS} min-h-32 resize-y`}
         placeholder={question.placeholder}
         value={typeof value === "string" ? value : ""}
         onChange={(event) => onChange(event.target.value)}
@@ -77,7 +83,13 @@ function QuestionField({
     return (
       <select
         id={question.id}
-        className="field"
+        className={`${CONTROL_CLASS} appearance-none bg-[length:16px] pr-10`}
+        style={{
+          backgroundImage:
+            "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%235f7186'%3E%3Cpath fill-rule='evenodd' d='M5.5 7.5 10 12l4.5-4.5' clip-rule='evenodd'/%3E%3C/svg%3E\")",
+          backgroundRepeat: "no-repeat",
+          backgroundPosition: "right 0.75rem center",
+        }}
         value={typeof value === "string" ? value : ""}
         onChange={(event) => onChange(event.target.value)}
       >
@@ -91,64 +103,38 @@ function QuestionField({
     );
   }
 
-  if (question.type === "radio") {
-    return (
-      <div className="space-y-2" role="radiogroup" aria-label={question.label}>
-        {options.map((option) => {
-          const checked = value === option;
-          return (
-            <label
-              key={option}
-              className={`flex min-h-12 cursor-pointer items-center gap-3 rounded-lg border px-4 py-3 text-base transition ${
-                checked
-                  ? "border-brand-600 bg-brand-50 text-brand-900 ring-1 ring-brand-600"
-                  : "border-slate-300 bg-white text-slate-800 hover:border-slate-400"
-              }`}
-            >
-              <input
-                type="radio"
-                name={question.id}
-                className="h-4 w-4 shrink-0 border-slate-300 text-brand-600 focus:ring-brand-600"
-                value={option}
-                checked={checked}
-                onChange={() => onChange(option)}
-              />
-              <span>{option}</span>
-            </label>
-          );
-        })}
-      </div>
-    );
-  }
-
-  if (question.type === "checkbox") {
+  if (question.type === "radio" || question.type === "checkbox") {
+    const choiceType = question.type;
     const selected = Array.isArray(value) ? value : [];
+    const stringValue = typeof value === "string" ? value : "";
     return (
-      <div className="space-y-2" role="group" aria-label={question.label}>
+      <div className="space-y-2.5" id={groupId} role="group">
         {options.map((option) => {
-          const checked = selected.includes(option);
+          const checked =
+            question.type === "radio"
+              ? stringValue === option
+              : selected.includes(option);
           return (
-            <label
+            <ChoiceOption
               key={option}
-              className={`flex min-h-12 cursor-pointer items-start gap-3 rounded-lg border px-4 py-3 text-base transition ${
-                checked
-                  ? "border-brand-600 bg-brand-50 text-brand-900 ring-1 ring-brand-600"
-                  : "border-slate-300 bg-white text-slate-800 hover:border-slate-400"
-              }`}
-            >
-              <input
-                type="checkbox"
-                className="mt-1 h-4 w-4 shrink-0 rounded border-slate-300 text-brand-600 focus:ring-brand-600"
-                checked={checked}
-                onChange={() => {
-                  const next = checked
+              type={choiceType}
+              name={question.id}
+              value={option}
+              checked={checked}
+              onChange={() => {
+                if (choiceType === "radio") {
+                  onChange(option);
+                  return;
+                }
+                onChange(
+                  checked
                     ? selected.filter((item) => item !== option)
-                    : [...selected, option];
-                  onChange(next);
-                }}
-              />
-              <span>{option}</span>
-            </label>
+                    : [...selected, option],
+                );
+              }}
+            >
+              {option}
+            </ChoiceOption>
           );
         })}
       </div>
@@ -175,7 +161,7 @@ function QuestionField({
             ? "numeric"
             : undefined
       }
-      className="field"
+      className={CONTROL_CLASS}
       placeholder={question.placeholder}
       value={typeof value === "string" ? value : ""}
       onChange={(event) => onChange(event.target.value)}
@@ -243,7 +229,7 @@ export default function FormViewer({ config, disabled }: FormViewerProps) {
     }
     if (!signature) {
       setError(
-        "Tanda tangan masih kosong. bubuhkan tanda tangan pada kolom yang tersedia sebelum mengirim.",
+        "Tanda tangan masih kosong. Bubuhkan tanda tangan pada kolom yang tersedia sebelum mengirim.",
       );
       return;
     }
@@ -300,77 +286,42 @@ export default function FormViewer({ config, disabled }: FormViewerProps) {
 
   if (submitted) {
     return (
-      <div className="panel rounded-xl border-t-4 border-t-emerald-500 p-6 text-center sm:p-8">
-        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-emerald-600 text-xl font-bold text-white">
-          OK
-        </div>
-        <h2 className="mt-4 text-xl font-bold text-ink">Absensi terkirim</h2>
-        <p className="mt-2 text-sm leading-relaxed text-slate-600">
+      <Card className="border-l-4 border-l-success-700 p-6 sm:p-8">
+        <Alert tone="success" title="Absensi terkirim">
           {config.confirmationMessage ||
             "Terima kasih. Data absensi Anda sudah diterima panitia."}
-        </p>
-        <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
-          <button type="button" onClick={resetForm} className="btn btn-secondary">
+        </Alert>
+        <div className="mt-6">
+          <Button variant="secondary" onClick={resetForm} fullWidth>
             Isi absensi lagi
-          </button>
+          </Button>
         </div>
-      </div>
+      </Card>
     );
   }
 
   if (!currentPage) {
     return (
-      <div className="alert-warn">
+      <Alert tone="warn">
         Formulir ini belum memiliki halaman isian. Hubungi admin untuk
         melengkapi pengaturan form.
-      </div>
+      </Alert>
     );
   }
 
-  const progress = ((pageIndex + 1) / pages.length) * 100;
-
   return (
-    <div className="panel rounded-xl p-5 sm:p-7">
-      <div className="mb-6">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div className="min-w-0">
-            <p className="text-sm font-semibold text-brand-700">
-              Halaman {pageIndex + 1} dari {pages.length}
-            </p>
-            <h2 className="mt-1 text-lg font-bold text-ink">
-              {currentPage.title}
-            </h2>
-            {currentPage.description ? (
-              <p className="mt-1 text-sm leading-relaxed text-slate-600">
-                {currentPage.description}
-              </p>
-            ) : null}
-          </div>
-          <span className="status-pill bg-brand-50 text-brand-800">
-            {pageQuestions.length} pertanyaan
-          </span>
-        </div>
-        <div
-          className="mt-4 h-2 w-full overflow-hidden rounded-full bg-slate-100"
-          role="progressbar"
-          aria-valuenow={Math.round(progress)}
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-label="Progres pengisian"
-        >
-          <div
-            className="h-full rounded-full bg-brand-600 transition-all"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-        {config.description && pageIndex === 0 ? (
-          <p className="mt-4 text-sm leading-relaxed text-slate-600">
-            {config.description}
-          </p>
+    <Card className="p-5 sm:p-7">
+      <div className="border-b border-line pb-5">
+        <h2 className="type-title">{currentPage.title}</h2>
+        {currentPage.description ? (
+          <p className="type-body mt-2 text-muted">{currentPage.description}</p>
         ) : null}
+        <div className="mt-4">
+          <ProgressSteps current={pageIndex + 1} total={pages.length} />
+        </div>
       </div>
 
-      <div className="space-y-6">
+      <div className="space-y-7 pt-6">
         {pageQuestions.map((question) => {
           const message = validateQuestion(
             question,
@@ -378,44 +329,36 @@ export default function FormViewer({ config, disabled }: FormViewerProps) {
           );
           const showError =
             message !== null &&
-            (message !== "wajib diisi" ||
-              (answers[question.id] !== undefined &&
-                isEmptyValue(answers[question.id]) === false));
+            message !== "wajib diisi" &&
+            !isEmptyValue(answers[question.id]);
 
           return (
-            <div key={question.id}>
-              <label
-                htmlFor={question.id}
-                className="field-label"
-              >
-                {question.label}
-                {question.required ? (
-                  <span className="ml-1 text-red-600" aria-hidden>
-                    *
-                  </span>
-                ) : null}
-              </label>
+            <Field
+              key={question.id}
+              label={question.label}
+              htmlFor={question.id}
+              required={question.required}
+              error={showError ? message : null}
+            >
               <QuestionField
                 question={question}
                 value={answers[question.id]}
                 onChange={(value) => setAnswer(question.id, value)}
               />
-              {showError && message && message !== "wajib diisi" ? (
-                <p className="mt-1.5 text-sm font-medium text-red-600">
-                  {message}
-                </p>
-              ) : null}
-            </div>
+            </Field>
           );
         })}
 
         {isLastPage ? (
-          <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-            <p className="mb-3 text-sm font-semibold text-slate-800">
+          <div className="rounded-lg border border-line bg-sunken p-4 sm:p-5">
+            <p className="type-heading">
               Tanda tangan
-              <span className="ml-1 text-red-600" aria-hidden>
+              <span className="ml-1 text-danger-600" aria-hidden>
                 *
               </span>
+            </p>
+            <p className="type-caption mb-3 mt-1">
+              Tanda tangan wajib diisi sebelum absensi dikirim.
             </p>
             <SignaturePad onChange={setSignature} />
           </div>
@@ -423,48 +366,55 @@ export default function FormViewer({ config, disabled }: FormViewerProps) {
       </div>
 
       {error ? (
-        <div className="alert-error mt-5" role="alert">
+        <Alert tone="danger" className="mt-6">
           {error}
-        </div>
+        </Alert>
       ) : null}
 
       {disabled ? (
-        <div className="alert-warn mt-5">
+        <Alert tone="warn" className="mt-6">
           Formulir sudah ditutup. Anda tidak dapat mengirim absensi melalui
           tautan ini.
-        </div>
+        </Alert>
       ) : null}
 
-      <div className="mt-7 flex flex-col-reverse gap-3 border-t border-slate-200 pt-5 sm:flex-row sm:items-center sm:justify-between">
-        <button
-          type="button"
+      <div className="mt-7 flex flex-col gap-3 border-t border-line pt-5 sm:flex-row sm:items-center sm:justify-between">
+        <Button
+          variant="secondary"
           onClick={goPrev}
           disabled={pageIndex === 0 || submitting || disabled}
-          className="btn btn-secondary w-full sm:w-auto"
+          fullWidth
+          className="sm:w-auto"
         >
           Sebelumnya
-        </button>
+        </Button>
 
         {isLastPage ? (
-          <button
-            type="button"
-            onClick={handleSubmit}
+          <Button
+            variant="accent"
+            size="lg"
+            onClick={() => {
+              void handleSubmit();
+            }}
             disabled={submitting || disabled}
-            className="btn btn-primary w-full sm:w-auto"
+            fullWidth
+            className="sm:w-auto"
           >
             {submitting ? "Mengirim absensi..." : "Kirim absensi"}
-          </button>
+          </Button>
         ) : (
-          <button
-            type="button"
+          <Button
+            variant="primary"
+            size="lg"
             onClick={goNext}
             disabled={submitting || disabled}
-            className="btn btn-primary w-full sm:w-auto"
+            fullWidth
+            className="sm:w-auto"
           >
             Lanjutkan
-          </button>
+          </Button>
         )}
       </div>
-    </div>
+    </Card>
   );
 }

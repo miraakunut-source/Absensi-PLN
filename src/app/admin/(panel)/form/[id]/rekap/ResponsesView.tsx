@@ -1,11 +1,17 @@
 "use client";
 
-import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
-import PrintButton from "./PrintButton";
+import Alert from "@/components/ui/Alert";
+import Badge from "@/components/ui/Badge";
+import Button from "@/components/ui/Button";
+import Card, { CardFooter, CardHeader } from "@/components/ui/Card";
+import EmptyState from "@/components/ui/EmptyState";
+import PageHeader from "@/components/ui/PageHeader";
 import { buildCsvRows, downloadTextFile } from "@/lib/csvExport";
 import { getConfig, listResponses } from "@/lib/formStorage";
 import type { FormConfig, FormResponse, Question } from "@/types";
+import PrintButton from "./PrintButton";
 
 function formatDate(value: string): string {
   try {
@@ -136,8 +142,8 @@ export default function ResponsesView({ formId }: ResponsesViewProps) {
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-6xl px-4 py-16 text-center text-sm text-slate-500">
-        Memuat rekap absensi...
+      <div className="mx-auto max-w-6xl px-4 py-16 text-center">
+        <p className="type-body text-muted">Memuat rekap absensi...</p>
       </div>
     );
   }
@@ -145,33 +151,30 @@ export default function ResponsesView({ formId }: ResponsesViewProps) {
   if (error) {
     return (
       <div className="mx-auto max-w-6xl px-4 py-16">
-        <div className="alert-error" role="alert">
-          {error}
+        <Alert tone="danger">{error}</Alert>
+        <div className="mt-5">
+          <Button href="/admin/dashboard" variant="secondary">
+            Kembali ke dashboard
+          </Button>
         </div>
-        <Link
-          href="/admin/dashboard"
-          className="btn btn-secondary mt-5 inline-flex"
-        >
-          Kembali ke dashboard
-        </Link>
       </div>
     );
   }
 
   if (!config) {
     return (
-      <div className="mx-auto max-w-6xl px-4 py-16 text-center">
-        <p className="text-base font-bold text-ink">Form tidak ditemukan</p>
-        <p className="mt-2 text-sm text-slate-600">
-          Kegiatan mungkin sudah dihapus. Kembali ke dashboard untuk memilih
-          kegiatan lain.
-        </p>
-        <Link
-          href="/admin/dashboard"
-          className="btn btn-secondary mt-5 inline-flex"
-        >
-          Kembali ke dashboard
-        </Link>
+      <div className="mx-auto max-w-6xl px-4 py-16">
+        <Card>
+          <EmptyState
+            title="Form tidak ditemukan"
+            description="Kegiatan mungkin sudah dihapus. Kembali ke dashboard untuk memilih kegiatan lain."
+            action={
+              <Button href="/admin/dashboard" variant="secondary">
+                Kembali ke dashboard
+              </Button>
+            }
+          />
+        </Card>
       </div>
     );
   }
@@ -192,80 +195,96 @@ export default function ResponsesView({ formId }: ResponsesViewProps) {
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:py-8">
-      <div className="mb-6 flex flex-col gap-4 border-b border-slate-200 pb-6 print:hidden sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <p className="text-sm font-semibold text-brand-700">Rekap absensi</p>
-          <h1 className="page-title mt-1">{config.title}</h1>
-          <p className="page-subtitle">
-            {responses.length} peserta tercatat. Kegiatan {eventLabel}.
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <Link href="/admin/dashboard" className="btn btn-secondary">
-            Dashboard
-          </Link>
-          <Link
-            href={`/admin/form/${encodeURIComponent(formId)}/edit`}
-            className="btn btn-secondary"
-          >
-            Edit form
-          </Link>
-          <button
-            type="button"
-            onClick={exportCsv}
-            disabled={responses.length === 0}
-            className="btn btn-secondary"
-          >
-            Unduh CSV
-          </button>
-          <PrintButton />
-        </div>
-      </div>
+      <PageHeader
+        title={config.title}
+        description={`${responses.length} peserta tercatat. Kegiatan ${eventLabel}.`}
+        className="print:hidden"
+        actions={
+          <>
+            <Button href="/admin/dashboard" variant="secondary">
+              Dashboard
+            </Button>
+            <Button
+              href={`/admin/form/${encodeURIComponent(formId)}/edit`}
+              variant="secondary"
+            >
+              Edit form
+            </Button>
+            <Button
+              onClick={exportCsv}
+              variant="secondary"
+              disabled={responses.length === 0}
+            >
+              Unduh CSV
+            </Button>
+            <PrintButton />
+          </>
+        }
+      />
 
       {responses.length === 0 ? (
-        <div className="panel mb-6 rounded-xl border-dashed px-4 py-12 text-center print:hidden">
-          <p className="text-base font-bold text-ink">
-            Belum ada peserta yang mengisi absensi
-          </p>
-          <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-slate-600">
-            Bagikan QR Code atau tautan kegiatan kepada peserta. Jawaban akan
-            muncul di tabel ini setelah terkirim.
-          </p>
-        </div>
+        <Card className="mb-6 print:hidden">
+          <EmptyState
+            compact
+            title="Belum ada peserta yang mengisi absensi"
+            description="Bagikan QR Code atau tautan kegiatan kepada peserta. Jawaban akan muncul di tabel ini setelah terkirim."
+          />
+        </Card>
       ) : (
-        <section className="panel mb-6 overflow-hidden rounded-xl print:hidden">
+        <Card className="mb-6 overflow-hidden print:hidden">
+          <CardHeader
+            title="Rekap peserta"
+            description={
+              period === "-"
+                ? "Periode pengisian akan tampil setelah ada jawaban."
+                : `Periode pengisian: ${period}`
+            }
+            actions={<Badge tone="brand">{responses.length} peserta</Badge>}
+          />
+
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[720px] text-left text-sm">
-              <thead className="border-b border-slate-200 bg-slate-50 text-slate-600">
+            <table className="type-body w-full min-w-[720px] text-left">
+              <thead className="border-b border-line bg-sunken">
                 <tr>
-                  <th className="px-4 py-3 font-semibold">No</th>
-                  <th className="px-4 py-3 font-semibold">Nama peserta</th>
-                  <th className="px-4 py-3 font-semibold">Waktu kirim</th>
-                  <th className="px-4 py-3 text-right font-semibold">Aksi</th>
+                  <th scope="col" className="type-label px-4 py-3">
+                    No
+                  </th>
+                  <th scope="col" className="type-label px-4 py-3">
+                    Nama peserta
+                  </th>
+                  <th scope="col" className="type-label px-4 py-3">
+                    Waktu kirim
+                  </th>
+                  <th
+                    scope="col"
+                    className="type-label px-4 py-3 text-right"
+                  >
+                    Aksi
+                  </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-line">
                 {responses.map((row, index) => {
                   const expanded = expandedId === row.id;
                   return (
                     <tr key={row.id} className="align-top">
-                      <td className="px-4 py-3 text-slate-500">{index + 1}</td>
+                      <td className="px-4 py-3 text-muted">{index + 1}</td>
                       <td className="px-4 py-3 font-semibold text-ink">
                         {respondentName(row)}
                       </td>
-                      <td className="px-4 py-3 text-slate-600">
+                      <td className="px-4 py-3 text-body">
                         {formatDateTime(row.createdAt)}
                       </td>
                       <td className="px-4 py-3 text-right">
-                        <button
-                          type="button"
+                        <Button
                           onClick={() =>
                             setExpandedId(expanded ? null : row.id)
                           }
-                          className="btn btn-secondary btn-sm"
+                          variant="secondary"
+                          size="sm"
                         >
                           {expanded ? "Tutup detail" : "Lihat detail"}
-                        </button>
+                        </Button>
                       </td>
                     </tr>
                   );
@@ -281,21 +300,18 @@ export default function ResponsesView({ formId }: ResponsesViewProps) {
                   const signature =
                     row.signatureUrl || row.signatureDataUrl || null;
                   return (
-                    <div
-                      key={`detail-${row.id}`}
-                      className="border-t border-slate-200 bg-slate-50 px-4 py-5"
-                    >
-                      <div className="mb-3 flex items-center justify-between gap-3">
-                        <h3 className="text-sm font-bold text-ink">
+                    <CardFooter key={`detail-${row.id}`} className="bg-sunken">
+                      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+                        <h3 className="type-heading">
                           Detail jawaban: {respondentName(row)}
                         </h3>
-                        <button
-                          type="button"
+                        <Button
                           onClick={() => setExpandedId(null)}
-                          className="text-sm font-semibold text-brand-700 underline underline-offset-2"
+                          variant="ghost"
+                          size="sm"
                         >
                           Tutup
-                        </button>
+                        </Button>
                       </div>
                       <div className="grid gap-4 sm:grid-cols-[1fr_180px]">
                         <dl className="space-y-3">
@@ -304,10 +320,8 @@ export default function ResponsesView({ formId }: ResponsesViewProps) {
                               key={column.id}
                               className="grid gap-1 sm:grid-cols-[180px_1fr] sm:gap-3"
                             >
-                              <dt className="text-sm font-semibold text-slate-600">
-                                {column.label}
-                              </dt>
-                              <dd className="text-sm text-ink">
+                              <dt className="type-label">{column.label}</dt>
+                              <dd className="type-body">
                                 {displayValue(
                                   column,
                                   row.answers[column.id],
@@ -316,10 +330,8 @@ export default function ResponsesView({ formId }: ResponsesViewProps) {
                             </div>
                           ))}
                         </dl>
-                        <div className="rounded-lg border border-slate-200 bg-white p-3 text-center">
-                          <p className="mb-2 text-xs font-semibold text-slate-600">
-                            Tanda tangan
-                          </p>
+                        <div className="rounded-lg border border-line bg-surface p-3 text-center">
+                          <p className="type-label mb-2">Tanda tangan</p>
                           {signature ? (
                             // eslint-disable-next-line @next/next/no-img-element
                             <img
@@ -328,27 +340,31 @@ export default function ResponsesView({ formId }: ResponsesViewProps) {
                               className="mx-auto max-h-32 w-auto object-contain"
                             />
                           ) : (
-                            <p className="text-xs text-slate-400">-</p>
+                            <p className="type-caption">-</p>
                           )}
                         </div>
                       </div>
-                    </div>
+                    </CardFooter>
                   );
                 })
             : null}
-        </section>
+        </Card>
       )}
 
-      <section className="print-area mx-auto max-w-[210mm] bg-white p-6 shadow-lg print:max-w-none print:p-0 print:shadow-none">
+      <section className="print-area mx-auto max-w-[210mm] border border-line bg-white p-6 text-black print:max-w-none print:border-0 print:p-0 print:shadow-none">
         <header className="mb-6 flex items-center gap-4 border-b-4 border-double border-black pb-4">
-          <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded bg-brand-800 text-3xl font-black text-gold-500 print:print-color-adjust-exact">
-            PLN
-          </div>
+          <Image
+            src="/logo-pln.png"
+            alt="Logo PLN"
+            width={64}
+            height={64}
+            className="h-16 w-16 shrink-0 print:print-color-adjust-exact"
+          />
           <div className="flex-1 text-center text-black">
             <p className="text-[11px] font-semibold uppercase tracking-[0.35em]">
               PT PLN (PERSERO)
             </p>
-            <h2 className="text-2xl font-black uppercase tracking-[0.2em]">
+            <h2 className="text-2xl font-black uppercase tracking-[0.2em] text-black">
               UP3 Kediri
             </h2>
             <p className="text-[10px] leading-tight">
@@ -360,31 +376,31 @@ export default function ResponsesView({ formId }: ResponsesViewProps) {
         </header>
 
         <div className="mb-6 text-center text-black">
-          <h3 className="text-base font-bold uppercase tracking-wide">
+          <h3 className="text-base font-bold uppercase tracking-wide text-black">
             Laporan Absensi Kegiatan
           </h3>
           <p className="mt-1 text-sm font-semibold">{config.title}</p>
           <p className="text-sm">Tanggal Kegiatan: {eventLabel}</p>
-          <p className="text-xs text-slate-700">
+          <p className="text-xs text-black">
             Periode pengisian: {period}
           </p>
-          <p className="text-xs text-slate-700">
+          <p className="text-xs text-black">
             Jumlah peserta: {responses.length}
           </p>
-          <p className="text-xs text-slate-700">
+          <p className="text-xs text-black">
             Nomor: .../UP3 KEDIRI/ABS/{currentWibYear()}
           </p>
         </div>
 
         {responses.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-slate-400 px-4 py-10 text-center text-sm text-slate-600">
+          <div className="border border-dashed border-black bg-white px-4 py-10 text-center text-sm text-black">
             Belum ada data absensi untuk kegiatan ini.
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full min-w-[640px] border-collapse text-[11px] text-black">
               <thead>
-                <tr className="bg-slate-100 print:print-color-adjust-exact">
+                <tr className="bg-white print:print-color-adjust-exact">
                   <th className="border border-black px-2 py-2 text-center">
                     No
                   </th>
@@ -444,7 +460,7 @@ export default function ResponsesView({ formId }: ResponsesViewProps) {
           </div>
         )}
 
-        <div className="mt-10 flex justify-between gap-8 text-black print:break-inside-avoid">
+        <div className="mt-10 flex flex-col gap-8 text-black print:break-inside-avoid sm:flex-row sm:justify-between">
           <div className="text-[12px]">
             <p className="mb-1 font-semibold">Mengetahui,</p>
             <p>Kepala UP3 Kediri</p>
@@ -452,7 +468,7 @@ export default function ResponsesView({ formId }: ResponsesViewProps) {
             <p className="mt-1 font-semibold">...............................</p>
             <p className="text-[11px]">NIP. ............................</p>
           </div>
-          <div className="text-right text-[12px]">
+          <div className="text-left text-[12px] sm:text-right">
             <p>Kediri, {formatLongDate(new Date())}</p>
             <p className="mt-1">Petugas Rekap Absensi</p>
             <div className="ml-auto mt-16 min-w-48 border-b border-dotted border-black" />

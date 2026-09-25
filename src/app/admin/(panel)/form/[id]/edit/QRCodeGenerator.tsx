@@ -2,6 +2,7 @@
 
 import { QRCodeCanvas } from "qrcode.react";
 import { useRef } from "react";
+import Button from "@/components/ui/Button";
 
 interface QRCodeGeneratorProps {
   value: string;
@@ -25,8 +26,8 @@ export default function QRCodeGenerator({
   };
 
   return (
-    <div className="flex flex-col items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 p-4">
-      <div className="rounded-lg bg-white p-2">
+    <div className="flex flex-col items-center gap-4">
+      <div className="rounded-md border border-line bg-surface p-4">
         <QRCodeCanvas
           ref={canvasRef}
           value={value}
@@ -35,12 +36,17 @@ export default function QRCodeGenerator({
           marginSize={2}
         />
       </div>
-      <p className="max-w-[220px] break-all text-center font-mono text-[11px] text-slate-500">
+      <p className="type-caption max-w-[220px] break-all text-center font-mono">
         {value}
       </p>
-      <button type="button" onClick={download} className="btn btn-secondary btn-sm w-full">
+      <Button
+        variant="secondary"
+        size="sm"
+        fullWidth
+        onClick={download}
+      >
         Unduh QR Code
-      </button>
+      </Button>
     </div>
   );
 }

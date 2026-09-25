@@ -17,18 +17,17 @@ interface PublicFormResponse {
 
 function LoadingPanel({ label }: { label: string }) {
   return (
-    <div className="mx-auto max-w-2xl px-4 py-16">
-      <div className="panel animate-pulse rounded-xl p-6">
-        <div className="h-4 w-40 rounded bg-slate-200" />
-        <div className="mt-3 h-7 w-3/4 rounded bg-slate-200" />
-        <div className="mt-6 space-y-3">
-          <div className="h-4 w-full rounded bg-slate-100" />
-          <div className="h-11 w-full rounded-lg bg-slate-100" />
-          <div className="h-4 w-2/3 rounded bg-slate-100" />
-          <div className="h-11 w-full rounded-lg bg-slate-100" />
+    <div className="mx-auto max-w-2xl px-4 py-8">
+      <div className="animate-pulse rounded-lg border border-line bg-surface p-5 sm:p-7">
+        <div className="h-3 w-32 rounded bg-sunken" />
+        <div className="mt-3 h-7 w-3/4 rounded bg-sunken" />
+        <div className="mt-6 h-2 w-full rounded bg-sunken" />
+        <div className="mt-8 space-y-4">
+          <div className="h-11 w-full rounded-lg bg-sunken" />
+          <div className="h-11 w-full rounded-lg bg-sunken" />
         </div>
-        <p className="mt-6 text-sm text-slate-500">{label}</p>
       </div>
+      <p className="type-caption mt-4">{label}</p>
     </div>
   );
 }
@@ -92,14 +91,14 @@ function AbsenFormContent({ id }: { id: string }) {
 
   if (error === "not_found" || !config) {
     return (
-      <div className="mx-auto max-w-2xl px-4 py-10">
+      <div className="mx-auto max-w-2xl px-4 py-8">
         <StatusPanel
           tone="error"
           title="Form tidak ditemukan"
           message={
             error === "not_found"
               ? "QR Code atau tautan ini tidak terdaftar. Pastikan Anda memindai QR resmi dari panitia, atau minta tautan absensi terbaru kepada panitia kegiatan."
-              : (error ?? "Formulir tidak dapat dimuat.")
+              : (error ?? "Formulir ini tidak dapat dimuat.")
           }
         />
       </div>
@@ -116,7 +115,7 @@ function AbsenFormContent({ id }: { id: string }) {
       max_reached: "Kuota peserta sudah penuh",
     };
     return (
-      <div className="mx-auto max-w-2xl px-4 py-10">
+      <div className="mx-auto max-w-2xl px-4 py-8">
         <StatusPanel
           tone="warn"
           title={titles[openState ?? ""] ?? "Absensi tidak dapat diisi"}
@@ -140,7 +139,7 @@ function AbsenFormContent({ id }: { id: string }) {
         eventDate={config.eventDate}
         note={
           preview && openState && openState !== "open" ? (
-            <div className="alert-warn">
+            <div className="rounded-md border border-warn-200 bg-warn-50 px-4 py-3 text-sm text-warn-800">
               Mode pratinjau: status form saat ini{" "}
               <strong>{getOpenStateMessage(openState) || openState}</strong>.
               Pengisian dan pengiriman dinonaktifkan.
@@ -148,7 +147,9 @@ function AbsenFormContent({ id }: { id: string }) {
           ) : null
         }
       />
-      <FormViewer config={config} disabled={!allowFill} />
+      <div className="mt-6">
+        <FormViewer config={config} disabled={!allowFill} />
+      </div>
     </div>
   );
 }

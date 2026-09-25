@@ -1,8 +1,14 @@
 "use client";
 
-import Link from "next/link";
 import { QRCodeCanvas } from "qrcode.react";
 import { useCallback, useEffect, use, useState } from "react";
+import Alert from "@/components/ui/Alert";
+import Badge from "@/components/ui/Badge";
+import Button from "@/components/ui/Button";
+import Card, { CardBody, CardFooter, CardHeader } from "@/components/ui/Card";
+import EmptyState from "@/components/ui/EmptyState";
+import Field, { ChoiceOption, CONTROL_CLASS_SM } from "@/components/ui/Field";
+import PageHeader from "@/components/ui/PageHeader";
 import QRCodeGenerator from "./QRCodeGenerator";
 import { getConfig, saveConfig } from "@/lib/formStorage";
 import type {
@@ -158,23 +164,28 @@ export default function EditFormPage({
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-6xl px-4 py-16 text-center text-sm text-slate-500">
-        Memuat editor form...
+      <div className="mx-auto w-full max-w-6xl px-4 py-16">
+        <Card className="mx-auto max-w-xl">
+          <div className="type-body px-5 py-8 text-center text-muted" role="status">
+            Memuat editor form...
+          </div>
+        </Card>
       </div>
     );
   }
 
   if (notFound || !config) {
     return (
-      <div className="mx-auto max-w-6xl px-4 py-16 text-center">
-        <p className="text-base font-bold text-ink">Form tidak ditemukan</p>
-        <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-slate-600">
-          Kegiatan dengan tautan ini tidak ada atau sudah dihapus. Kembali ke
-          dashboard untuk memilih kegiatan lain.
-        </p>
-        <Link href="/admin/dashboard" className="btn btn-primary mt-5 inline-flex">
-          Kembali ke dashboard
-        </Link>
+      <div className="mx-auto w-full max-w-6xl px-4 py-16">
+        <Card className="mx-auto max-w-xl">
+          <EmptyState
+            title="Form tidak ditemukan"
+            description="Kegiatan dengan tautan ini tidak ada atau sudah dihapus. Kembali ke dashboard untuk memilih kegiatan lain."
+            action={
+              <Button href="/admin/dashboard">Kembali ke dashboard</Button>
+            }
+          />
+        </Card>
       </div>
     );
   }
@@ -315,518 +326,585 @@ export default function EditFormPage({
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:py-8">
-      <div className="mb-6 flex flex-col gap-4 border-b border-slate-200 pb-6 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <p className="text-sm font-semibold text-brand-700">Editor form</p>
-          <h1 className="page-title mt-1">Atur kegiatan absensi</h1>
-          <p className="page-subtitle">
-            Sesuaikan informasi kegiatan, halaman form, pertanyaan, dan QR Code
-            untuk peserta.
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <Link href="/admin/dashboard" className="btn btn-secondary">
-            Dashboard
-          </Link>
-          <button
-            type="button"
-            onClick={() => window.open(previewUrl, "_blank", "noopener")}
-            className="btn btn-secondary"
-          >
-            Pratinjau form
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              void copyLink();
-            }}
-            className="btn btn-secondary"
-          >
-            Salin tautan
-          </button>
-          <button
-            type="button"
-            onClick={handleSave}
-            disabled={saving}
-            className="btn btn-primary"
-          >
-            {saving ? "Menyimpan..." : "Simpan formulir"}
-          </button>
-        </div>
-      </div>
+      <PageHeader
+        title="Atur kegiatan absensi"
+        description="Sesuaikan informasi kegiatan, halaman form, pertanyaan, dan QR Code untuk peserta."
+        actions={
+          <>
+            <Button href="/admin/dashboard" variant="secondary">
+              Dashboard
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                window.open(previewUrl, "_blank", "noopener");
+              }}
+            >
+              Pratinjau form
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                void copyLink();
+              }}
+            >
+              Salin tautan
+            </Button>
+            <Button onClick={handleSave} disabled={saving}>
+              {saving ? "Menyimpan..." : "Simpan formulir"}
+            </Button>
+          </>
+        }
+      />
 
       {message ? (
-        <div
-          className={`mb-5 ${messageTone === "error" ? "alert-error" : "alert-info"}`}
-          role="status"
+        <Alert
+          tone={messageTone === "error" ? "danger" : "info"}
+          className="mb-6"
         >
           {message}
-        </div>
+        </Alert>
       ) : null}
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_300px]">
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_18rem]">
         <div className="space-y-6">
-          <section className="panel rounded-xl p-5">
-            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-              <h2 className="panel-title">Informasi kegiatan</h2>
-              <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
-                <span>Status absensi</span>
-                <select
-                  className="field-sm w-auto"
-                  value={config.status}
-                  onChange={(event) =>
-                    updateConfig((current) => ({
-                      ...current,
-                      status:
-                        event.target.value === "open" ? "open" : "closed",
-                    }))
-                  }
+          <Card>
+            <CardHeader
+              title="Informasi kegiatan"
+              actions={
+                <Field
+                  label="Status absensi"
+                  htmlFor="form-status"
+                  className="w-44"
                 >
-                  <option value="open">Dibuka</option>
-                  <option value="closed">Ditutup</option>
-                </select>
-              </label>
-            </div>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="sm:col-span-2">
-                <label className="field-label">Judul kegiatan</label>
-                <input
-                  type="text"
-                  className="field-sm"
-                  placeholder="Contoh: Rapat Koordinasi Bulanan UP3 Kediri"
-                  value={config.title}
-                  onChange={(event) =>
-                    updateConfig((current) => ({
-                      ...current,
-                      title: event.target.value,
-                    }))
-                  }
-                />
-              </div>
-              <div>
-                <label className="field-label">Tanggal kegiatan</label>
-                <input
-                  type="date"
-                  className="field-sm"
-                  value={config.eventDate ?? ""}
-                  onChange={(event) =>
-                    updateConfig((current) => ({
-                      ...current,
-                      eventDate: event.target.value,
-                    }))
-                  }
-                />
-              </div>
-              <div>
-                <label className="field-label">Batas waktu otomatis</label>
-                <input
-                  type="datetime-local"
-                  className="field-sm"
-                  value={toLocalInput(config.closesAt)}
-                  onChange={(event) =>
-                    updateConfig((current) => ({
-                      ...current,
-                      closesAt: fromLocalInput(event.target.value),
-                    }))
-                  }
-                />
-              </div>
-              <div>
-                <label className="field-label">Maksimum peserta</label>
-                <input
-                  type="number"
-                  min={0}
-                  className="field-sm"
-                  placeholder="Kosong = tanpa batas"
-                  value={config.maxResponses ?? ""}
-                  onChange={(event) =>
-                    updateConfig((current) => ({
-                      ...current,
-                      maxResponses: event.target.value
-                        ? Number(event.target.value)
-                        : null,
-                    }))
-                  }
-                />
-              </div>
-              <div>
-                <label className="field-label">Token QR</label>
-                <input
-                  type="text"
-                  readOnly
-                  className="field-sm font-mono text-xs text-slate-600"
-                  value={config.token}
-                />
-              </div>
-              <div className="sm:col-span-2">
-                <label className="field-label">
-                  Deskripsi untuk peserta (opsional)
-                </label>
-                <textarea
-                  className="field-sm min-h-20 resize-y"
-                  value={config.description ?? ""}
-                  onChange={(event) =>
-                    updateConfig((current) => ({
-                      ...current,
-                      description: event.target.value,
-                    }))
-                  }
-                />
-              </div>
-              <div className="sm:col-span-2">
-                <label className="field-label">
-                  Pesan konfirmasi setelah submit
-                </label>
-                <textarea
-                  className="field-sm min-h-16 resize-y"
-                  value={config.confirmationMessage ?? ""}
-                  onChange={(event) =>
-                    updateConfig((current) => ({
-                      ...current,
-                      confirmationMessage: event.target.value,
-                    }))
-                  }
-                />
-              </div>
-            </div>
-          </section>
-
-          <section className="panel rounded-xl p-5">
-            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-              <h2 className="panel-title">Halaman form</h2>
-              <button
-                type="button"
-                onClick={addPage}
-                className="btn btn-secondary btn-sm"
-              >
-                Tambah halaman
-              </button>
-            </div>
-
-            <div className="mb-5 flex flex-wrap gap-2">
-              {config.pages.map((page, index) => {
-                const active = page.id === activePage?.id;
-                return (
-                  <button
-                    key={page.id}
-                    type="button"
-                    onClick={() => setActivePageId(page.id)}
-                    className={`rounded-lg px-4 py-2 text-sm font-semibold transition ${
-                      active
-                        ? "bg-brand-700 text-white"
-                        : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                    }`}
+                  <select
+                    id="form-status"
+                    className={CONTROL_CLASS_SM}
+                    value={config.status}
+                    onChange={(event) =>
+                      updateConfig((current) => ({
+                        ...current,
+                        status:
+                          event.target.value === "open" ? "open" : "closed",
+                      }))
+                    }
                   >
-                    {index + 1}. {page.title}
-                  </button>
-                );
-              })}
-            </div>
-
-            {activePage ? (
-              <div className="space-y-5">
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <input
-                    type="text"
-                    className="field-sm"
-                    value={activePage.title}
-                    onChange={(event) =>
-                      updatePage(activePage.id, {
-                        title: event.target.value,
-                      })
-                    }
-                  />
-                  <input
-                    type="text"
-                    placeholder="Deskripsi halaman (opsional)"
-                    className="field-sm"
-                    value={activePage.description ?? ""}
-                    onChange={(event) =>
-                      updatePage(activePage.id, {
-                        description: event.target.value,
-                      })
-                    }
-                  />
-                </div>
-                <button
-                  type="button"
-                  onClick={() => deletePage(activePage.id)}
-                  className="btn btn-danger"
+                    <option value="open">Dibuka</option>
+                    <option value="closed">Ditutup</option>
+                  </select>
+                </Field>
+              }
+            />
+            <CardBody>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Field
+                  label="Judul kegiatan"
+                  htmlFor="form-title"
+                  className="sm:col-span-2"
                 >
-                  Hapus halaman ini
-                </button>
+                  <input
+                    id="form-title"
+                    type="text"
+                    className={CONTROL_CLASS_SM}
+                    placeholder="Contoh: Rapat Koordinasi Bulanan UP3 Kediri"
+                    value={config.title}
+                    onChange={(event) =>
+                      updateConfig((current) => ({
+                        ...current,
+                        title: event.target.value,
+                      }))
+                    }
+                  />
+                </Field>
+                <Field label="Tanggal kegiatan" htmlFor="form-event-date">
+                  <input
+                    id="form-event-date"
+                    type="date"
+                    className={CONTROL_CLASS_SM}
+                    value={config.eventDate ?? ""}
+                    onChange={(event) =>
+                      updateConfig((current) => ({
+                        ...current,
+                        eventDate: event.target.value,
+                      }))
+                    }
+                  />
+                </Field>
+                <Field
+                  label="Batas waktu otomatis"
+                  htmlFor="form-closes-at"
+                >
+                  <input
+                    id="form-closes-at"
+                    type="datetime-local"
+                    className={CONTROL_CLASS_SM}
+                    value={toLocalInput(config.closesAt)}
+                    onChange={(event) =>
+                      updateConfig((current) => ({
+                        ...current,
+                        closesAt: fromLocalInput(event.target.value),
+                      }))
+                    }
+                  />
+                </Field>
+                <Field
+                  label="Maksimum peserta"
+                  htmlFor="form-max-participants"
+                >
+                  <input
+                    id="form-max-participants"
+                    type="number"
+                    min={0}
+                    className={CONTROL_CLASS_SM}
+                    placeholder="Kosong = tanpa batas"
+                    value={config.maxResponses ?? ""}
+                    onChange={(event) =>
+                      updateConfig((current) => ({
+                        ...current,
+                        maxResponses: event.target.value
+                          ? Number(event.target.value)
+                          : null,
+                      }))
+                    }
+                  />
+                </Field>
+                <Field label="Token QR" htmlFor="form-token">
+                  <input
+                    id="form-token"
+                    type="text"
+                    readOnly
+                    className={`${CONTROL_CLASS_SM} font-mono text-muted`}
+                    value={config.token}
+                  />
+                </Field>
+                <Field
+                  label="Deskripsi untuk peserta (opsional)"
+                  htmlFor="form-description"
+                  className="sm:col-span-2"
+                >
+                  <textarea
+                    id="form-description"
+                    className={`${CONTROL_CLASS_SM} min-h-20 resize-y`}
+                    value={config.description ?? ""}
+                    onChange={(event) =>
+                      updateConfig((current) => ({
+                        ...current,
+                        description: event.target.value,
+                      }))
+                    }
+                  />
+                </Field>
+                <Field
+                  label="Pesan konfirmasi setelah submit"
+                  htmlFor="form-confirmation-message"
+                  className="sm:col-span-2"
+                >
+                  <textarea
+                    id="form-confirmation-message"
+                    className={`${CONTROL_CLASS_SM} min-h-16 resize-y`}
+                    value={config.confirmationMessage ?? ""}
+                    onChange={(event) =>
+                      updateConfig((current) => ({
+                        ...current,
+                        confirmationMessage: event.target.value,
+                      }))
+                    }
+                  />
+                </Field>
+              </div>
+            </CardBody>
+          </Card>
 
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <p className="text-sm text-slate-600">
+          <Card>
+            <CardHeader
+              title="Halaman form"
+              actions={
+                <Button variant="secondary" size="sm" onClick={addPage}>
+                  Tambah halaman
+                </Button>
+              }
+            />
+            {activePage ? (
+              <>
+                <CardBody className="space-y-6">
+                  <div
+                    className="flex flex-wrap gap-2"
+                    role="group"
+                    aria-label="Pilih halaman form"
+                  >
+                    {config.pages.map((page, index) => {
+                      const active = page.id === activePage.id;
+                      return (
+                        <Button
+                          key={page.id}
+                          variant={active ? "primary" : "secondary"}
+                          size="sm"
+                          aria-pressed={active}
+                          onClick={() => setActivePageId(page.id)}
+                        >
+                          {index + 1}. {page.title}
+                        </Button>
+                      );
+                    })}
+                  </div>
+
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <Field
+                      label="Judul halaman"
+                      htmlFor={`page-title-${activePage.id}`}
+                    >
+                      <input
+                        id={`page-title-${activePage.id}`}
+                        type="text"
+                        className={CONTROL_CLASS_SM}
+                        value={activePage.title}
+                        onChange={(event) =>
+                          updatePage(activePage.id, {
+                            title: event.target.value,
+                          })
+                        }
+                      />
+                    </Field>
+                    <Field
+                      label="Deskripsi halaman (opsional)"
+                      htmlFor={`page-description-${activePage.id}`}
+                    >
+                      <input
+                        id={`page-description-${activePage.id}`}
+                        type="text"
+                        className={CONTROL_CLASS_SM}
+                        value={activePage.description ?? ""}
+                        onChange={(event) =>
+                          updatePage(activePage.id, {
+                            description: event.target.value,
+                          })
+                        }
+                      />
+                    </Field>
+                  </div>
+
+                  <div className="space-y-4">
+                    {activeQuestions.length === 0 ? (
+                      <EmptyState
+                        compact
+                        title="Belum ada pertanyaan"
+                        description="Tambahkan pertanyaan agar peserta tahu data yang perlu diisi."
+                        action={
+                          <Button onClick={addQuestion}>
+                            Tambah pertanyaan
+                          </Button>
+                        }
+                      />
+                    ) : (
+                      activeQuestions.map((question, index) => {
+                        const typeLabel =
+                          QUESTION_TYPES.find(
+                            (type) => type.value === question.type,
+                          )?.label ?? question.type;
+
+                        return (
+                          <Card key={question.id}>
+                            <CardHeader
+                              title={`Pertanyaan ${index + 1}`}
+                              actions={
+                                <>
+                                  <Badge tone="brand">{typeLabel}</Badge>
+                                  <Button
+                                    variant="secondary"
+                                    size="sm"
+                                    onClick={() =>
+                                      moveQuestion(question.id, -1)
+                                    }
+                                  >
+                                    Naik
+                                  </Button>
+                                  <Button
+                                    variant="secondary"
+                                    size="sm"
+                                    onClick={() =>
+                                      moveQuestion(question.id, 1)
+                                    }
+                                  >
+                                    Turun
+                                  </Button>
+                                  <Button
+                                    variant="danger"
+                                    size="sm"
+                                    onClick={() =>
+                                      deleteQuestion(question.id)
+                                    }
+                                  >
+                                    Hapus
+                                  </Button>
+                                </>
+                              }
+                            />
+                            <CardBody>
+                              <div className="grid gap-4 sm:grid-cols-2">
+                                <Field
+                                  label="Label pertanyaan"
+                                  htmlFor={`question-label-${question.id}`}
+                                  className="sm:col-span-2"
+                                >
+                                  <input
+                                    id={`question-label-${question.id}`}
+                                    type="text"
+                                    className={CONTROL_CLASS_SM}
+                                    value={question.label}
+                                    onChange={(event) =>
+                                      updateQuestion(question.id, {
+                                        label: event.target.value,
+                                      })
+                                    }
+                                  />
+                                </Field>
+                                <Field
+                                  label="Jenis pertanyaan"
+                                  htmlFor={`question-type-${question.id}`}
+                                >
+                                  <select
+                                    id={`question-type-${question.id}`}
+                                    className={CONTROL_CLASS_SM}
+                                    value={question.type}
+                                    onChange={(event) =>
+                                      updateQuestion(question.id, {
+                                        type: event.target
+                                          .value as QuestionType,
+                                      })
+                                    }
+                                  >
+                                    {QUESTION_TYPES.map((type) => (
+                                      <option
+                                        key={type.value}
+                                        value={type.value}
+                                      >
+                                        {type.label}
+                                      </option>
+                                    ))}
+                                  </select>
+                                </Field>
+                                <Field
+                                  label="Validasi"
+                                  htmlFor={`question-validation-${question.id}`}
+                                >
+                                  <select
+                                    id={`question-validation-${question.id}`}
+                                    className={CONTROL_CLASS_SM}
+                                    value={question.validation ?? "none"}
+                                    onChange={(event) =>
+                                      updateQuestion(question.id, {
+                                        validation: event.target
+                                          .value as QuestionValidation,
+                                      })
+                                    }
+                                  >
+                                    {VALIDATION_OPTIONS.map((option) => (
+                                      <option
+                                        key={option.value}
+                                        value={option.value}
+                                      >
+                                        {option.label}
+                                      </option>
+                                    ))}
+                                  </select>
+                                </Field>
+                                <Field
+                                  label="Pindahkan ke halaman"
+                                  htmlFor={`question-destination-${question.id}`}
+                                >
+                                  <select
+                                    id={`question-destination-${question.id}`}
+                                    className={CONTROL_CLASS_SM}
+                                    value={activePage.id}
+                                    onChange={(event) =>
+                                      moveQuestionToPage(
+                                        question.id,
+                                        event.target.value,
+                                      )
+                                    }
+                                  >
+                                    {config.pages.map((page, pageIndexValue) => (
+                                      <option key={page.id} value={page.id}>
+                                        {pageIndexValue + 1}. {page.title}
+                                      </option>
+                                    ))}
+                                  </select>
+                                </Field>
+                                <Field
+                                  label="Placeholder (opsional)"
+                                  htmlFor={`question-placeholder-${question.id}`}
+                                >
+                                  <input
+                                    id={`question-placeholder-${question.id}`}
+                                    type="text"
+                                    className={CONTROL_CLASS_SM}
+                                    value={question.placeholder ?? ""}
+                                    onChange={(event) =>
+                                      updateQuestion(question.id, {
+                                        placeholder: event.target.value,
+                                      })
+                                    }
+                                  />
+                                </Field>
+                                {needsOptions(question.type) ? (
+                                  <Field
+                                    label="Opsi (satu per baris)"
+                                    htmlFor={`question-options-${question.id}`}
+                                    className="sm:col-span-2"
+                                  >
+                                    <textarea
+                                      id={`question-options-${question.id}`}
+                                      className={`${CONTROL_CLASS_SM} min-h-24 resize-y`}
+                                      value={(question.options ?? []).join(
+                                        "\n",
+                                      )}
+                                      onChange={(event) =>
+                                        updateQuestion(question.id, {
+                                          options: event.target.value.split(
+                                            "\n",
+                                          ),
+                                        })
+                                      }
+                                    />
+                                  </Field>
+                                ) : null}
+                                <div className="sm:col-span-2">
+                                  <ChoiceOption
+                                    type="checkbox"
+                                    name={`question-${question.id}-required`}
+                                    value="required"
+                                    checked={Boolean(question.required)}
+                                    onChange={() =>
+                                      updateQuestion(question.id, {
+                                        required: !Boolean(question.required),
+                                      })
+                                    }
+                                  >
+                                    Wajib diisi peserta
+                                  </ChoiceOption>
+                                </div>
+                              </div>
+                            </CardBody>
+                          </Card>
+                        );
+                      })
+                    )}
+                  </div>
+                </CardBody>
+                <CardFooter className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <p className="type-body text-muted">
                     {activeQuestions.length} pertanyaan di halaman ini
                   </p>
-                  <button
-                    type="button"
-                    onClick={addQuestion}
-                    className="btn btn-primary"
-                  >
-                    Tambah pertanyaan
-                  </button>
-                </div>
-
-                <div className="space-y-4">
-                  {activeQuestions.length === 0 ? (
-                    <div className="rounded-lg border border-dashed border-slate-300 px-4 py-10 text-center">
-                      <p className="text-sm font-semibold text-slate-700">
-                        Belum ada pertanyaan
-                      </p>
-                      <p className="mt-1 text-sm text-slate-500">
-                        Tambahkan pertanyaan agar peserta tahu data yang perlu
-                        diisi.
-                      </p>
-                    </div>
-                  ) : (
-                    activeQuestions.map((question, index) => (
-                      <div
-                        key={question.id}
-                        className="space-y-3 rounded-xl border border-slate-200 bg-slate-50 p-4"
-                      >
-                        <div className="flex flex-wrap items-center justify-between gap-2">
-                          <span className="text-xs font-semibold text-slate-500">
-                            Pertanyaan {index + 1}
-                          </span>
-                          <div className="flex flex-wrap gap-1.5">
-                            <button
-                              type="button"
-                              onClick={() => moveQuestion(question.id, -1)}
-                              className="btn btn-secondary btn-sm"
-                            >
-                              Naik
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => moveQuestion(question.id, 1)}
-                              className="btn btn-secondary btn-sm"
-                            >
-                              Turun
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => deleteQuestion(question.id)}
-                              className="btn btn-danger btn-sm"
-                            >
-                              Hapus
-                            </button>
-                          </div>
-                        </div>
-
-                        <div className="grid gap-3 sm:grid-cols-2">
-                          <div className="sm:col-span-2">
-                            <label className="mb-1 block text-xs font-medium text-slate-600">
-                              Label pertanyaan
-                            </label>
-                            <input
-                              type="text"
-                              className="field-sm"
-                              value={question.label}
-                              onChange={(event) =>
-                                updateQuestion(question.id, {
-                                  label: event.target.value,
-                                })
-                              }
-                            />
-                          </div>
-                          <div>
-                            <label className="mb-1 block text-xs font-medium text-slate-600">
-                              Jenis pertanyaan
-                            </label>
-                            <select
-                              className="field-sm"
-                              value={question.type}
-                              onChange={(event) =>
-                                updateQuestion(question.id, {
-                                  type: event.target.value as QuestionType,
-                                })
-                              }
-                            >
-                              {QUESTION_TYPES.map((type) => (
-                                <option key={type.value} value={type.value}>
-                                  {type.label}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-                          <div>
-                            <label className="mb-1 block text-xs font-medium text-slate-600">
-                              Validasi
-                            </label>
-                            <select
-                              className="field-sm"
-                              value={question.validation ?? "none"}
-                              onChange={(event) =>
-                                updateQuestion(question.id, {
-                                  validation: event.target
-                                    .value as QuestionValidation,
-                                })
-                              }
-                            >
-                              {VALIDATION_OPTIONS.map((option) => (
-                                <option
-                                  key={option.value}
-                                  value={option.value}
-                                >
-                                  {option.label}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-                          <div>
-                            <label className="mb-1 block text-xs font-medium text-slate-600">
-                              Pindahkan ke halaman
-                            </label>
-                            <select
-                              className="field-sm"
-                              value={activePage.id}
-                              onChange={(event) =>
-                                moveQuestionToPage(
-                                  question.id,
-                                  event.target.value,
-                                )
-                              }
-                            >
-                              {config.pages.map((page, pageIndexValue) => (
-                                <option key={page.id} value={page.id}>
-                                  {pageIndexValue + 1}. {page.title}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-                          <div>
-                            <label className="mb-1 block text-xs font-medium text-slate-600">
-                              Placeholder (opsional)
-                            </label>
-                            <input
-                              type="text"
-                              className="field-sm"
-                              value={question.placeholder ?? ""}
-                              onChange={(event) =>
-                                updateQuestion(question.id, {
-                                  placeholder: event.target.value,
-                                })
-                              }
-                            />
-                          </div>
-                          {needsOptions(question.type) ? (
-                            <div className="sm:col-span-2">
-                              <label className="mb-1 block text-xs font-medium text-slate-600">
-                                Opsi (satu per baris)
-                              </label>
-                              <textarea
-                                className="field-sm min-h-24 resize-y"
-                                value={(question.options ?? []).join("\n")}
-                                onChange={(event) =>
-                                  updateQuestion(question.id, {
-                                    options: event.target.value.split("\n"),
-                                  })
-                                }
-                              />
-                            </div>
-                          ) : null}
-                          <label className="flex items-center gap-2 text-sm text-slate-700">
-                            <input
-                              type="checkbox"
-                              className="h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-600"
-                              checked={Boolean(question.required)}
-                              onChange={(event) =>
-                                updateQuestion(question.id, {
-                                  required: event.target.checked,
-                                })
-                              }
-                            />
-                            Wajib diisi peserta
-                          </label>
-                        </div>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </div>
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      variant="danger"
+                      onClick={() => deletePage(activePage.id)}
+                    >
+                      Hapus halaman ini
+                    </Button>
+                    {activeQuestions.length > 0 ? (
+                      <Button onClick={addQuestion}>
+                        Tambah pertanyaan
+                      </Button>
+                    ) : null}
+                  </div>
+                </CardFooter>
+              </>
             ) : null}
-          </section>
+          </Card>
         </div>
 
-        <aside className="space-y-4">
-          <section className="panel rounded-xl p-5">
-            <h2 className="panel-title">QR Code peserta</h2>
-            <p className="mb-4 mt-1 text-sm leading-relaxed text-slate-600">
-              QR unik untuk kegiatan ini. Peserta memindai QR untuk membuka form
-              tanpa login.
-            </p>
-            {formUrl ? <QRCodeGenerator value={formUrl} /> : null}
-            <button
-              type="button"
-              onClick={() => setPrintQr(true)}
-              className="btn btn-secondary mt-3 w-full"
-            >
-              Cetak QR Code
-            </button>
-          </section>
+        <aside className="space-y-6">
+          <Card>
+            <CardHeader
+              title="QR Code peserta"
+              description="QR unik untuk kegiatan ini. Peserta memindai QR untuk membuka form tanpa login."
+            />
+            <CardBody>
+              {formUrl ? <QRCodeGenerator value={formUrl} /> : null}
+              <Button
+                variant="secondary"
+                fullWidth
+                className="mt-4"
+                onClick={() => setPrintQr(true)}
+              >
+                Cetak QR Code
+              </Button>
+            </CardBody>
+          </Card>
 
-          <section className="panel rounded-xl p-5">
-            <h2 className="panel-title">Tautan peserta</h2>
-            <p className="mt-3 break-all rounded-lg bg-slate-50 p-3 font-mono text-xs text-brand-800">
-              {formUrl}
-            </p>
-            <div className="mt-3 flex flex-col gap-2">
-              <button
-                type="button"
-                onClick={() => {
-                  void copyLink();
-                }}
-                className="btn btn-secondary w-full"
-              >
-                Salin tautan
-              </button>
-              <button
-                type="button"
-                onClick={() => window.open(previewUrl, "_blank", "noopener")}
-                className="btn btn-secondary w-full"
-              >
-                Buka pratinjau
-              </button>
-            </div>
-          </section>
+          <Card>
+            <CardHeader title="Tautan peserta" />
+            <CardBody>
+              <p className="type-caption break-all rounded-md bg-sunken p-4 font-mono text-brand-800">
+                {formUrl}
+              </p>
+              <div className="mt-4 flex flex-col gap-2">
+                <Button
+                  variant="secondary"
+                  fullWidth
+                  onClick={() => {
+                    void copyLink();
+                  }}
+                >
+                  Salin tautan
+                </Button>
+                <Button
+                  variant="secondary"
+                  fullWidth
+                  onClick={() => {
+                    window.open(previewUrl, "_blank", "noopener");
+                  }}
+                >
+                  Buka pratinjau
+                </Button>
+              </div>
+            </CardBody>
+          </Card>
         </aside>
       </div>
 
       {printQr ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/60 p-4 print:static print:bg-white">
-          <div className="max-h-[90vh] w-full max-w-sm overflow-auto rounded-xl bg-white p-6 print:max-w-none print:rounded-none print:p-0">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/60 p-4 print:static print:bg-surface">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="print-qr-title"
+            className="max-h-[90vh] w-full max-w-sm overflow-auto rounded-xl border border-line bg-surface p-6 print:max-w-none print:rounded-none print:border-0 print:p-0"
+          >
             <div className="mb-4 flex items-center justify-between gap-3 print:hidden">
-              <p className="text-sm font-bold text-ink">Cetak QR absensi</p>
+              <p id="print-qr-title" className="type-heading">
+                Cetak QR absensi
+              </p>
               <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => window.print()}
-                  className="btn btn-primary btn-sm"
+                <Button
+                  size="sm"
+                  onClick={() => {
+                    window.print();
+                  }}
                 >
                   Cetak
-                </button>
-                <button
-                  type="button"
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="sm"
                   onClick={() => setPrintQr(false)}
-                  className="btn btn-secondary btn-sm"
                 >
                   Tutup
-                </button>
+                </Button>
               </div>
             </div>
-            <div className="flex flex-col items-center gap-3 text-center print:mt-8">
-              <p className="text-sm font-extrabold text-brand-800">
+            <div className="flex flex-col items-center gap-4 text-center print:mt-8">
+              <p className="type-subtitle text-brand-800">
                 PT PLN (Persero) UP3 Kediri
               </p>
-              <p className="text-base font-bold text-ink">{config.title}</p>
-              <p className="text-sm text-slate-600">{config.eventDate ?? ""}</p>
+              <p className="type-title max-w-xs break-words">{config.title}</p>
+              <p className="type-caption">{config.eventDate ?? ""}</p>
               <QRCodeCanvas value={formUrl} size={240} marginSize={2} />
-              <p className="text-sm font-medium text-slate-700">
+              <p className="type-body text-body">
                 Pindai QR untuk mengisi absensi
               </p>
-              <p className="max-w-xs break-all font-mono text-[10px] text-slate-500">
+              <p className="type-caption max-w-xs break-all font-mono">
                 {formUrl}
               </p>
             </div>

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import BrandBar from "@/components/brand/BrandBar";
 import Button from "@/components/ui/Button";
 import Card, { CardHeader } from "@/components/ui/Card";
@@ -5,23 +6,28 @@ import Card, { CardHeader } from "@/components/ui/Card";
 export default function HomePage() {
   return (
     <div className="flex min-h-dvh flex-col">
-      <BrandBar width="wide" />
+      <BrandBar
+        trailing={
+          <Link
+            href="/"
+            className="rounded-lg px-3 py-2 text-sm font-semibold text-white/80 transition-colors hover:bg-white/10 hover:text-white"
+          >
+            Beranda
+          </Link>
+        }
+      />
 
-      <div className="border-b border-line bg-brand-800">
-        <div className="mx-auto w-full max-w-3xl px-4 py-10 sm:py-14">
-          <h1 className="type-display text-white">
-            Absensi kegiatan UP3 Kediri
-          </h1>
-          <p className="type-body mt-4 max-w-xl text-white/80">
+      <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-6 sm:py-8">
+        <div className="border-b border-line pb-6">
+          <h1 className="type-display">Absensi kegiatan UP3 Kediri</h1>
+          <p className="type-body mt-3 max-w-xl text-muted">
             Form absensi resmi PLN UP3 Kediri. Peserta memindai QR Code kegiatan
             dan mengisi isian langsung di HP — tanpa akun, tanpa install
             aplikasi.
           </p>
         </div>
-      </div>
 
-      <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-8 sm:py-10">
-        <Card>
+        <Card className="mt-6">
           <CardHeader
             title="Untuk peserta"
             description="Absensi dibuka lewat QR Code kegiatan yang dibagikan panitia."

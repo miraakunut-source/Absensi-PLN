@@ -30,7 +30,6 @@ export default function AdminShell({ children }: AdminShellProps) {
   return (
     <div className="flex min-h-dvh flex-col">
       <BrandBar
-        width="wide"
         trailing={
           <>
             <Link

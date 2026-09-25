@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { QRCodeCanvas } from "qrcode.react";
 import { useEffect, useState } from "react";
 import Alert from "@/components/ui/Alert";
 import Badge from "@/components/ui/Badge";
@@ -51,6 +52,7 @@ export default function AdminDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [wallUrl, setWallUrl] = useState("");
 
   useEffect(() => {
     let cancelled = false;
@@ -58,6 +60,7 @@ export default function AdminDashboardPage() {
     (async () => {
       try {
         const list = await listForms();
+        setWallUrl(`${window.location.origin}/absen`);
         const entries = await Promise.all(
           list.map(async (form) => {
             try {
@@ -187,23 +190,25 @@ export default function AdminDashboardPage() {
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:py-8">
-      <PageHeader
-        title="Dashboard absensi"
-        description="Ringkasan kegiatan, jumlah peserta, serta kontrol buka dan tutup absensi peserta. Formulir baru hanya tersimpan setelah Anda menekan Simpan formulir di editor."
-        actions={
-          <Button
-            size="lg"
-            onClick={() => {
-              void handleCreate();
-            }}
-            disabled={busyId === "new"}
-          >
-            {busyId === "new" ? "Membuat kegiatan..." : "Buat kegiatan baru"}
-          </Button>
-        }
-      />
+      <div className="print:hidden">
+        <PageHeader
+          title="Dashboard absensi"
+          description="Ringkasan kegiatan, jumlah peserta, serta kontrol buka dan tutup absensi peserta. Formulir baru hanya tersimpan setelah Anda menekan Simpan formulir di editor."
+          actions={
+            <Button
+              size="lg"
+              onClick={() => {
+                void handleCreate();
+              }}
+              disabled={busyId === "new"}
+            >
+              {busyId === "new" ? "Membuat kegiatan..." : "Buat kegiatan baru"}
+            </Button>
+          }
+        />
+      </div>
 
-      <div className="mb-6 grid gap-3 sm:grid-cols-3">
+      <div className="mb-6 grid gap-3 print:hidden sm:grid-cols-3">
         {statItems.map((item) => (
           <Card
             key={item.label}
@@ -221,12 +226,13 @@ export default function AdminDashboardPage() {
       </div>
 
       {error ? (
-        <Alert tone="danger" className="mb-5">
+        <Alert tone="danger" className="mb-5 print:hidden">
           {error}
         </Alert>
       ) : null}
 
-      <Card tone="transparent" className="border border-line">
+      <div className="print:hidden">
+        <Card tone="transparent" className="border border-line">
         <CardHeader
           title="Daftar kegiatan"
           description="Edit pertanyaan, buka tautan peserta, atau tutup absensi saat kegiatan selesai."
@@ -342,6 +348,43 @@ export default function AdminDashboardPage() {
             })}
           </ul>
         )}
+        </Card>
+      </div>
+
+      <Card className="print-area mt-6 p-5 sm:p-6">
+        <div className="flex flex-col items-center gap-5 text-center sm:flex-row sm:text-left">
+          <div className="shrink-0 rounded-md border border-line bg-surface p-3">
+            <QRCodeCanvas value={wallUrl} size={168} level="M" marginSize={2} />
+          </div>
+          <div className="min-w-0 flex-1">
+            <h2 className="type-title">QR Code tembok</h2>
+            <p className="type-body mt-2 text-muted">
+              Satu QR untuk semua kegiatan. Cetak sekali lalu tempel di tembok
+              atau meja depan. Peserta memindai QR ini dan memilih kegiatan yang
+              sedang dibuka, jadi QR tidak perlu diganti setiap kegiatan.
+            </p>
+            <p className="type-caption mt-3 break-all rounded-md bg-sunken p-3 font-mono text-brand-800">
+              {wallUrl}
+            </p>
+            <div className="mt-4 flex flex-wrap justify-center gap-2 sm:justify-start">
+              <Button variant="accent" onClick={() => window.print()}>
+                Cetak QR tembok
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  const link = document.createElement("a");
+                  link.href = wallUrl;
+                  link.target = "_blank";
+                  link.rel = "noopener";
+                  link.click();
+                }}
+              >
+                Buka halaman QR
+              </Button>
+            </div>
+          </div>
+        </div>
       </Card>
     </div>
   );

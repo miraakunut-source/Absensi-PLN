@@ -286,7 +286,7 @@ export default function AdminDashboardPage() {
                       <span className="type-caption">
                         {formatEventDate(form.eventDate)}
                       </span>
-                      <span className="type-caption font-semibold text-ink">
+                      <span className="type-caption font-semibold">
                         {count} peserta
                       </span>
                       <span className="type-caption">

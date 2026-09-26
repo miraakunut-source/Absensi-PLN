@@ -348,32 +348,9 @@ export default function EditFormPage({
         title="Atur kegiatan absensi"
         description="Sesuaikan informasi kegiatan, halaman form, pertanyaan, dan QR Code untuk peserta."
         actions={
-          <>
-            <Button href="/admin/dashboard" variant="secondary">
-              Dashboard
-            </Button>
-            <Button
-              variant="secondary"
-              disabled={isDraft}
-              onClick={() => {
-                window.open(previewUrl, "_blank", "noopener");
-              }}
-            >
-              Pratinjau form
-            </Button>
-            <Button
-              variant="secondary"
-              disabled={isDraft}
-              onClick={() => {
-                void copyLink();
-              }}
-            >
-              Salin tautan
-            </Button>
-            <Button variant="accent" onClick={handleSave} disabled={saving}>
-              {saving ? "Menyimpan..." : "Simpan formulir"}
-            </Button>
-          </>
+          <Button variant="accent" onClick={handleSave} disabled={saving}>
+            {saving ? "Menyimpan..." : "Simpan formulir"}
+          </Button>
         }
       />
 

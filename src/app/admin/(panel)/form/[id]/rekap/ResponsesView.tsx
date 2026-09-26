@@ -121,6 +121,7 @@ export default function ResponsesView({ formId }: ResponsesViewProps) {
       "Waktu Kirim",
       "Nama",
       ...columns.map((column) => column.label),
+      "Status TTD",
       "URL TTD",
     ];
     const rows = responses.map((row, index) => [
@@ -130,7 +131,12 @@ export default function ResponsesView({ formId }: ResponsesViewProps) {
       ...columns.map((column) =>
         displayValue(column, row.answers[column.id]),
       ),
-      row.signatureUrl || row.signatureDataUrl || "",
+      row.signatureUrl
+        ? "Tersimpan di Google Drive"
+        : row.signatureDataUrl
+          ? "Hanya tersedia di aplikasi"
+          : "Tidak ada",
+      row.signatureUrl || "",
     ]);
     const csv = buildCsvRows(headers, rows);
     const safeTitle = (config?.title ?? formId)
@@ -203,9 +209,6 @@ export default function ResponsesView({ formId }: ResponsesViewProps) {
         className="print:hidden"
         actions={
           <>
-            <Button href="/admin/dashboard" variant="secondary">
-              Dashboard
-            </Button>
             <Button
               href={`/admin/form/${encodeURIComponent(formId)}/edit`}
               variant="secondary"

@@ -12,7 +12,6 @@ import PasswordInput from "@/components/ui/PasswordInput";
 import {
   isFirebaseConfigured,
   loginAdmin,
-  logoutAdmin,
   watchAdmin,
 } from "@/lib/firebase";
 
@@ -109,11 +108,13 @@ export default function AdminLoginPage() {
 
       <main className="flex flex-1 items-center justify-center px-4 py-10">
         <div className="w-full max-w-md">
-          <h1 className="type-display">Masuk admin</h1>
-          <p className="type-body mt-2 text-muted">
-            Gunakan akun admin yang terdaftar di Firebase Authentication. Peserta
-            tidak perlu login untuk mengisi absensi.
-          </p>
+          <div className="text-center">
+            <h1 className="type-display">Login Admin</h1>
+            <p className="type-body mt-2 text-muted">
+              Gunakan akun admin yang terdaftar di Firebase Authentication.
+              Peserta tidak perlu login untuk mengisi absensi.
+            </p>
+          </div>
 
           <Card className="mt-6 p-6">
             <form onSubmit={handleSubmit} className="space-y-5">
@@ -162,26 +163,13 @@ export default function AdminLoginPage() {
             </form>
           </Card>
 
-          <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
+          <div className="mt-5 text-center">
             <Link
               href="/"
               className="text-sm font-semibold text-brand-700 hover:text-brand-800"
             >
               Kembali ke beranda
             </Link>
-            <Button
-              variant="ghost"
-              size="sm"
-              suppressHydrationWarning
-              onClick={() => {
-                void (async () => {
-                  await logoutAdmin();
-                  await fetch("/api/admin/session", { method: "DELETE" });
-                })();
-              }}
-            >
-              Keluar dari sesi aktif
-            </Button>
           </div>
         </div>
       </main>

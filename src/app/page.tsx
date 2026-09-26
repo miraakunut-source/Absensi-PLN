@@ -1,6 +1,5 @@
-import Link from "next/link";
+import BarLink from "@/components/brand/BarLink";
 import BrandBar from "@/components/brand/BrandBar";
-import Button from "@/components/ui/Button";
 import Card, { CardHeader } from "@/components/ui/Card";
 
 export default function HomePage() {
@@ -8,12 +7,10 @@ export default function HomePage() {
     <div className="flex min-h-dvh flex-col">
       <BrandBar
         trailing={
-          <Link
-            href="/"
-            className="rounded-lg px-3 py-2 text-sm font-semibold text-white/80 transition-colors hover:bg-white/10 hover:text-white"
-          >
-            Beranda
-          </Link>
+          <>
+            <BarLink href="/">Beranda</BarLink>
+            <BarLink href="/admin/login">Login Admin</BarLink>
+          </>
         }
       />
 
@@ -51,14 +48,6 @@ export default function HomePage() {
               Masuk dengan akun admin Firebase Auth untuk membuat kegiatan,
               mencetak QR Code, dan mengunduh rekap.
             </p>
-            <div className="mt-5 flex flex-wrap gap-3">
-              <Button href="/admin/login" size="lg">
-                Masuk ke dashboard admin
-              </Button>
-              <Button href="/admin/dashboard" variant="secondary" size="lg">
-                Buka dashboard
-              </Button>
-            </div>
           </div>
         </Card>
         <Card className="mt-6">

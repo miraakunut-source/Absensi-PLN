@@ -9,7 +9,7 @@ export default function HomePage() {
         trailing={
           <>
             <BarLink href="/">Beranda</BarLink>
-            <BarLink href="/admin/dashboard">Dashboard</BarLink>
+            <BarLink href="/admin/login">Login Admin</BarLink>
           </>
         }
       />

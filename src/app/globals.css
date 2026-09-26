@@ -62,6 +62,10 @@
 }
 
 @layer base {
+  :root {
+    --photo-veil: 0.82;
+  }
+
   body {
     background-color: var(--color-canvas);
     color: var(--color-body);
@@ -135,6 +139,19 @@
   outline-offset: 2px;
 }
 
+@utility photo-surface {
+  background-color: var(--color-canvas);
+  background-image: linear-gradient(
+      rgb(241 245 250 / var(--photo-veil)),
+      rgb(241 245 250 / var(--photo-veil))
+    ),
+    url("/background.jpg");
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
 @page {
   size: A4;
   margin: 14mm 12mm;
@@ -144,6 +161,7 @@
   html,
   body {
     background: #ffffff !important;
+    background-image: none !important;
     color: #000000 !important;
   }
 

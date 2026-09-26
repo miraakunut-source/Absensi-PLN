@@ -104,7 +104,7 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="flex min-h-dvh flex-col bg-canvas">
+    <div className="photo-surface flex min-h-dvh flex-col">
       <BrandBar />
 
       <main className="flex flex-1 items-center justify-center px-4 py-10">

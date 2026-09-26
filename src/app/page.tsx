@@ -15,15 +15,16 @@ export default function HomePage() {
         }
       />
 
-      <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-6 sm:py-8">
-        <div className="border-b border-line pb-6">
-          <h1 className="type-display">Absensi kegiatan UP3 Kediri</h1>
-          <p className="type-body mt-3 max-w-xl text-muted">
-            Form absensi resmi PLN UP3 Kediri. Peserta memindai QR Code kegiatan
-            dan mengisi isian langsung di HP — tanpa akun, tanpa install
-            aplikasi.
-          </p>
-        </div>
+      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:py-8">
+        <div className="mx-auto w-full max-w-3xl">
+          <div className="border-b border-line pb-6">
+            <h1 className="type-display">Absensi kegiatan UP3 Kediri</h1>
+            <p className="type-body mt-3 max-w-xl text-muted">
+              Form absensi resmi PLN UP3 Kediri. Peserta memindai QR Code
+              kegiatan dan mengisi isian langsung di HP — tanpa akun, tanpa
+              install aplikasi.
+            </p>
+          </div>
 
         <Card className="mt-6">
           <CardHeader
@@ -81,6 +82,7 @@ export default function HomePage() {
             ))}
           </ol>
         </Card>
+        </div>
       </main>
 
       <AppFooter />

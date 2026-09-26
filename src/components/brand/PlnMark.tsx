@@ -33,7 +33,9 @@ export default function PlnMark({
         </span>
         {!compact ? (
           <span
-            className={`type-caption ${inverted ? "text-white/70" : ""}`}
+            className={`type-caption hidden sm:inline ${
+              inverted ? "text-white/70" : ""
+            }`}
           >
             Sistem Absensi Kegiatan
           </span>

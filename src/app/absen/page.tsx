@@ -70,8 +70,9 @@ export default function AbsenIndexPage() {
 
   return (
     <PublicShell>
-      <div className="mx-auto max-w-2xl px-4 py-6 sm:py-8">
-        <div className="border-b border-line pb-5">
+      <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:py-8">
+        <div className="mx-auto w-full max-w-2xl">
+          <div className="border-b border-line pb-5">
           <p className="type-caption text-brand-700">Absensi kegiatan</p>
           <h1 className="type-display mt-2">Pilih kegiatan</h1>
           <p className="type-body mt-3 text-muted">
@@ -134,6 +135,7 @@ export default function AbsenIndexPage() {
             QR Code ini tetap berlaku untuk semua kegiatan. Tempel di tembok atau
             meja depan, lalu peserta cukup memindainya setiap kegiatan.
           </p>
+        </div>
         </div>
       </div>
     </PublicShell>

@@ -43,7 +43,7 @@ interface CommonProps {
 type ButtonAsButton = CommonProps &
   ButtonHTMLAttributes<HTMLButtonElement> & { href?: undefined };
 
-type ButtonAsLink = CommonProps & { href: string };
+type ButtonAsLink = CommonProps & { href: string; target?: string };
 
 export type ButtonProps = ButtonAsButton | ButtonAsLink;
 
@@ -70,7 +70,12 @@ export default function Button(props: ButtonProps) {
 
   if (props.href !== undefined) {
     return (
-      <Link href={props.href} className={className}>
+      <Link
+        href={props.href}
+        target={props.target}
+        rel={props.target === "_blank" ? "noopener" : undefined}
+        className={className}
+      >
         {children}
       </Link>
     );

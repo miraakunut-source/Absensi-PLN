@@ -132,22 +132,26 @@ function AbsenFormContent({ id }: { id: string }) {
   const allowFill = openState === "open";
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-6 sm:py-8">
-      <EventHeader
-        title={config.title}
-        description={config.description}
-        eventDate={config.eventDate}
-        note={
-          preview && openState && openState !== "open" ? (
-            <div className="rounded-md border border-warn-200 bg-warn-50 px-4 py-3 text-sm text-warn-800">
-              Mode pratinjau: status form saat ini{" "}
-              <strong>{getOpenStateMessage(openState) || openState}</strong>.
-              Pengisian dan pengiriman dinonaktifkan.
-            </div>
-          ) : null
-        }
-      />
-      <FormViewer config={config} disabled={!allowFill} />
+    <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:py-8">
+      <div className="mx-auto w-full max-w-2xl">
+        <EventHeader
+          title={config.title}
+          description={config.description}
+          eventDate={config.eventDate}
+          note={
+            preview && openState && openState !== "open" ? (
+              <div className="rounded-md border border-warn-200 bg-warn-50 px-4 py-3 text-sm text-warn-800">
+                Mode pratinjau: status form saat ini{" "}
+                <strong>{getOpenStateMessage(openState) || openState}</strong>.
+                Pengisian dan pengiriman dinonaktifkan.
+              </div>
+            ) : null
+          }
+        />
+        <div className="mt-5">
+          <FormViewer config={config} disabled={!allowFill} />
+        </div>
+      </div>
     </div>
   );
 }

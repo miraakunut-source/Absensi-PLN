@@ -17,7 +17,7 @@ export default function BarLink({ href, children }: BarLinkProps) {
     <Link
       href={href}
       aria-current={active ? "page" : undefined}
-      className={`rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${
+      className={`whitespace-nowrap rounded-lg px-2 py-1.5 text-xs font-semibold transition-colors sm:px-3 sm:py-2 sm:text-sm ${
         active
           ? "bg-white/15 text-white"
           : "text-white/80 hover:bg-white/10 hover:text-white"

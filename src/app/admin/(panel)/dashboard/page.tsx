@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { QRCodeCanvas } from "qrcode.react";
 import { useEffect, useState } from "react";
@@ -296,11 +295,13 @@ export default function AdminDashboardPage() {
                       </span>
                     </div>
                   </div>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center">
                     <Button
                       href={`/admin/form/${encodeURIComponent(form.id)}/edit`}
                       variant="secondary"
                       size="sm"
+                      fullWidth
+                      className="sm:w-auto"
                     >
                       Edit form
                     </Button>
@@ -308,19 +309,26 @@ export default function AdminDashboardPage() {
                       href={`/admin/form/${encodeURIComponent(form.id)}/rekap`}
                       variant="secondary"
                       size="sm"
+                      fullWidth
+                      className="sm:w-auto"
                     >
                       Rekap ({count})
                     </Button>
-                    <Link
+                    <Button
                       href={`/absen/${encodeURIComponent(form.token)}?preview=1`}
                       target="_blank"
-                      className="inline-flex min-h-9 items-center rounded-lg border border-line-strong bg-surface px-3 text-xs font-semibold text-ink transition-colors hover:bg-sunken focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600"
+                      variant="secondary"
+                      size="sm"
+                      fullWidth
+                      className="sm:w-auto"
                     >
                       Pratinjau
-                    </Link>
+                    </Button>
                     <Button
                       variant={open ? "accent" : "primary"}
                       size="sm"
+                      fullWidth
+                      className="sm:w-auto"
                       disabled={busy}
                       onClick={() => {
                         void toggleStatus(form);
@@ -335,6 +343,8 @@ export default function AdminDashboardPage() {
                     <Button
                       variant="danger"
                       size="sm"
+                      fullWidth
+                      className="col-span-2 sm:col-auto sm:w-auto"
                       disabled={busy}
                       onClick={() => {
                         void handleDelete(form);

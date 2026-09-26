@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { type ReactNode } from "react";
+import AppFooter from "@/components/brand/AppFooter";
 import BrandBar from "@/components/brand/BrandBar";
 import { logoutAdmin } from "@/lib/firebase";
 
@@ -68,13 +69,7 @@ export default function AdminShell({ children }: AdminShellProps) {
         }
       />
       <main className="flex-1">{children}</main>
-      <footer className="border-t border-line bg-surface">
-        <div className="mx-auto max-w-6xl px-4 py-5">
-          <p className="type-caption">
-            Absensi digital PT PLN (Persero) UP3 Kediri
-          </p>
-        </div>
-      </footer>
+      <AppFooter />
     </div>
   );
 }

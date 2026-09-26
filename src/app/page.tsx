@@ -1,3 +1,4 @@
+import AppFooter from "@/components/brand/AppFooter";
 import BarLink from "@/components/brand/BarLink";
 import BrandBar from "@/components/brand/BrandBar";
 import Card, { CardHeader } from "@/components/ui/Card";
@@ -82,13 +83,7 @@ export default function HomePage() {
         </Card>
       </main>
 
-      <footer className="border-t border-line bg-surface">
-        <div className="mx-auto w-full max-w-3xl px-4 py-5">
-          <p className="type-caption">
-            PT PLN (Persero) UP3 Kediri — sistem absensi digital.
-          </p>
-        </div>
-      </footer>
+      <AppFooter />
     </div>
   );
 }

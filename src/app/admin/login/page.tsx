@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useRef, useState } from "react";
+import AppFooter from "@/components/brand/AppFooter";
 import BrandBar from "@/components/brand/BrandBar";
 import Alert from "@/components/ui/Alert";
 import Button from "@/components/ui/Button";
@@ -173,6 +174,7 @@ export default function AdminLoginPage() {
           </div>
         </div>
       </main>
+      <AppFooter />
     </div>
   );
 }

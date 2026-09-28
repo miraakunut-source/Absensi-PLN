@@ -3,10 +3,7 @@ export function buildCsvRows(
   rows: (string | number)[][],
 ): string {
   const escape = (value: string | number): string => {
-    const raw = String(value ?? "");
-    const text = raw.startsWith("data:")
-      ? "[gambar tanda tangan, lihat di aplikasi]"
-      : raw;
+    const text = String(value ?? "");
     if (/[",\n\r]/.test(text)) {
       return `"${text.replace(/"/g, '""')}"`;
     }

@@ -10,6 +10,7 @@ import {
   orderBy,
   query,
   setDoc,
+  updateDoc,
   where,
 } from "firebase/firestore";
 import { createBlankForm, defaultFormConfig } from "@/lib/defaultForm";
@@ -426,6 +427,14 @@ export async function deleteForm(formId: string): Promise<void> {
       throw new Error(error.message);
     }
   }
+}
+
+export async function attachSignatureUrl(
+  responseId: string,
+  url: string,
+): Promise<void> {
+  if (!db) return;
+  await updateDoc(doc(db, "form_responses", responseId), { signatureUrl: url });
 }
 
 export async function listResponses(

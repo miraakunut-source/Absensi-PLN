@@ -1,7 +1,7 @@
 "use client";
 
 import { QRCodeCanvas } from "qrcode.react";
-import { useCallback, useEffect, use, useState } from "react";
+import { useCallback, useEffect, use, useRef, useState } from "react";
 import Alert from "@/components/ui/Alert";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
@@ -11,6 +11,7 @@ import Field, { ChoiceOption, CONTROL_CLASS_SM } from "@/components/ui/Field";
 import PageHeader from "@/components/ui/PageHeader";
 import QRCodeGenerator from "./QRCodeGenerator";
 import { createBlankForm } from "@/lib/defaultForm";
+import { deleteDraft, getDraft, saveDraft } from "@/lib/draftStorage";
 import { getConfig, saveConfig } from "@/lib/formStorage";
 import type {
   FormConfig,
@@ -75,6 +76,7 @@ export default function EditFormPage({
   const [messageTone, setMessageTone] = useState<"info" | "error">("info");
   const [formUrl, setFormUrl] = useState("");
   const [isDraft, setIsDraft] = useState(false);
+  const isDraftRef = useRef(false);
   const [activePageId, setActivePageId] = useState<string | null>(null);
   const [printQr, setPrintQr] = useState(false);
 
@@ -85,26 +87,33 @@ export default function EditFormPage({
       try {
         const draftRequested =
           new URLSearchParams(window.location.search).get("draft") === "1";
-        const existing = draftRequested ? null : await getConfig(formId);
+        const existing = await getConfig(formId);
         if (cancelled) return;
-        if (!existing) {
-          if (!draftRequested) {
-            setNotFound(true);
-            return;
-          }
-          const blank = createBlankForm({
+        if (existing) {
+          setConfig(existing);
+          setActivePageId(existing.pages[0]?.id ?? null);
+          setFormUrl(`${window.location.origin}/absen/${existing.token}`);
+          return;
+        }
+
+        const savedDraft = getDraft(formId);
+        if (!savedDraft && !draftRequested) {
+          setNotFound(true);
+          return;
+        }
+
+        const draft =
+          savedDraft ??
+          createBlankForm({
             id: formId,
             title: "Kegiatan Absensi Baru",
           });
-          setConfig(blank);
-          setIsDraft(true);
-          setActivePageId(blank.pages[0]?.id ?? null);
-          setFormUrl(`${window.location.origin}/absen/${blank.token}`);
-          return;
-        }
-        setConfig(existing);
-        setActivePageId(existing.pages[0]?.id ?? null);
-        setFormUrl(`${window.location.origin}/absen/${existing.token}`);
+        saveDraft(draft);
+        isDraftRef.current = true;
+        setConfig(draft);
+        setIsDraft(true);
+        setActivePageId(draft.pages[0]?.id ?? null);
+        setFormUrl(`${window.location.origin}/absen/${draft.token}`);
       } catch {
         if (cancelled) return;
         setMessageTone("error");
@@ -123,7 +132,14 @@ export default function EditFormPage({
 
   const updateConfig = useCallback(
     (updater: (current: FormConfig) => FormConfig) => {
-      setConfig((current) => (current ? updater(current) : current));
+      setConfig((current) => {
+        if (!current) return current;
+        const next = updater(current);
+        if (isDraftRef.current) {
+          saveDraft(next);
+        }
+        return next;
+      });
       setMessage(null);
     },
     [],
@@ -148,6 +164,8 @@ export default function EditFormPage({
         ),
       };
       await saveConfig(normalized);
+      deleteDraft(formId);
+      isDraftRef.current = false;
       setConfig(normalized);
       setIsDraft(false);
       window.history.replaceState(null, "", window.location.pathname);

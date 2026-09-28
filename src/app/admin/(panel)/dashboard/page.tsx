@@ -9,6 +9,7 @@ import Button from "@/components/ui/Button";
 import Card, { CardHeader } from "@/components/ui/Card";
 import EmptyState from "@/components/ui/EmptyState";
 import PageHeader from "@/components/ui/PageHeader";
+import { deleteDraft, listDrafts } from "@/lib/draftStorage";
 import { countResponses, deleteForm, listForms } from "@/lib/formStorage";
 import { getFormOpenState, getOpenStateMessage } from "@/lib/formStatus";
 import { generateId } from "@/lib/ids";
@@ -52,6 +53,7 @@ export default function AdminDashboardPage() {
   const [error, setError] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [wallUrl, setWallUrl] = useState("");
+  const [drafts, setDrafts] = useState<FormConfig[]>([]);
 
   useEffect(() => {
     let cancelled = false;
@@ -60,6 +62,7 @@ export default function AdminDashboardPage() {
       try {
         const list = await listForms();
         setWallUrl(`${window.location.origin}/absen`);
+        setDrafts(listDrafts());
         const entries = await Promise.all(
           list.map(async (form) => {
             try {
@@ -244,7 +247,7 @@ export default function AdminDashboardPage() {
             <div className="h-16 animate-pulse rounded-md bg-sunken" />
             <p className="type-caption">Memuat kegiatan...</p>
           </div>
-        ) : forms.length === 0 ? (
+        ) : forms.length === 0 && drafts.length === 0 ? (
           <EmptyState
             compact
             title="Belum ada kegiatan"
@@ -262,6 +265,48 @@ export default function AdminDashboardPage() {
           />
         ) : (
           <ul className="divide-y divide-line">
+            {drafts.map((draft) => (
+              <li
+                key={draft.id}
+                className="flex flex-col gap-4 bg-warn-50/60 px-5 py-5 lg:flex-row lg:items-start lg:justify-between"
+              >
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="type-heading min-w-0 break-words">
+                      {draft.title}
+                    </p>
+                    <Badge tone="warn">Belum disimpan</Badge>
+                  </div>
+                  <p className="type-caption mt-2">
+                    Draft kegiatan baru. Isi pengaturan di editor, lalu tekan
+                    Simpan formulir agar tersimpan dan bisa dibuka peserta.
+                  </p>
+                </div>
+                <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center">
+                  <Button
+                    href={`/admin/form/${encodeURIComponent(draft.id)}/edit?draft=1`}
+                    variant="accent"
+                    size="sm"
+                    fullWidth
+                    className="sm:w-auto"
+                  >
+                    Lanjutkan
+                  </Button>
+                  <Button
+                    variant="danger"
+                    size="sm"
+                    fullWidth
+                    className="sm:w-auto"
+                    onClick={() => {
+                      deleteDraft(draft.id);
+                      setDrafts(listDrafts());
+                    }}
+                  >
+                    Buang draft
+                  </Button>
+                </div>
+              </li>
+            ))}
             {forms.map((form) => {
               const count = counts[form.id] ?? 0;
               const state = getFormOpenState(form, count);

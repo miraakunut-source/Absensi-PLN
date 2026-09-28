@@ -1,12 +1,12 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import PlnMark from "@/components/brand/PlnMark";
 import PublicShell from "@/components/public/PublicShell";
 import StatusPanel from "@/components/public/StatusPanel";
 import Alert from "@/components/ui/Alert";
 import Badge from "@/components/ui/Badge";
+import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 
 interface Activity {
@@ -117,12 +117,13 @@ export default function AbsenIndexPage() {
                       {activity.description}
                     </p>
                   ) : null}
-                  <Link
+                  <Button
                     href={`/absen/${encodeURIComponent(activity.token)}`}
-                    className="mt-4 inline-flex min-h-11 w-full items-center justify-center rounded-lg bg-brand-600 px-4 text-sm font-semibold text-white transition-colors hover:bg-brand-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600 sm:w-auto sm:px-5"
+                    fullWidth
+                    className="mt-3"
                   >
                     Isi absensi
-                  </Link>
+                  </Button>
                 </Card>
               </li>
             ))}

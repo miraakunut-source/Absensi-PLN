@@ -108,7 +108,6 @@ export default function EditFormPage({
             id: formId,
             title: "Kegiatan Absensi Baru",
           });
-        saveDraft(draft);
         isDraftRef.current = true;
         setConfig(draft);
         setIsDraft(true);

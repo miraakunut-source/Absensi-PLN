@@ -9,7 +9,7 @@ import Card, { CardFooter, CardHeader } from "@/components/ui/Card";
 import EmptyState from "@/components/ui/EmptyState";
 import PageHeader from "@/components/ui/PageHeader";
 import { buildCsvRows, downloadTextFile } from "@/lib/csvExport";
-import { getConfig, listResponses, attachSignatureUrl } from "@/lib/formStorage";
+import { getConfig, listResponses } from "@/lib/formStorage";
 import type { FormConfig, FormResponse, Question } from "@/types";
 import PrintButton from "./PrintButton";
 import SignatureImage from "@/components/admin/SignatureImage";
@@ -98,8 +98,6 @@ export default function ResponsesView({ formId }: ResponsesViewProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
-  const [syncing, setSyncing] = useState(false);
-  const [syncMessage, setSyncMessage] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -129,55 +127,6 @@ export default function ResponsesView({ formId }: ResponsesViewProps) {
       cancelled = true;
     };
   }, [formId]);
-
-  const missingSignatureRows = useMemo(
-    () => responses.filter((row) => !row.signatureUrl && row.signatureDataUrl),
-    [responses],
-  );
-
-  const syncSignatures = async () => {
-    if (missingSignatureRows.length === 0) return;
-    setSyncing(true);
-    setSyncMessage(null);
-    let stored = 0;
-    const failed: string[] = [];
-
-    for (const row of missingSignatureRows) {
-      try {
-        const response = await fetch("/api/signature", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            formId,
-            respondentName: respondentName(row),
-            signatureDataUrl: row.signatureDataUrl,
-          }),
-        });
-        if (!response.ok) {
-          failed.push(respondentName(row));
-          continue;
-        }
-        const data = (await response.json()) as { url?: string | null };
-        if (!data.url) {
-          failed.push(respondentName(row));
-          continue;
-        }
-        await attachSignatureUrl(row.id, data.url);
-        stored += 1;
-      } catch {
-        failed.push(respondentName(row));
-      }
-    }
-
-    const refreshed = await listResponses(formId);
-    setResponses(refreshed);
-    setSyncing(false);
-    setSyncMessage(
-      failed.length === 0
-        ? `${stored} tanda tangan berhasil diunggah ke Google Drive.`
-        : `${stored} berhasil, ${failed.length} gagal: ${failed.join(", ")}.`,
-    );
-  };
 
   const columns = useMemo(() => config?.questions ?? [], [config]);
 
@@ -457,39 +406,6 @@ export default function ResponsesView({ formId }: ResponsesViewProps) {
             Nomor: .../UP3 KEDIRI/ABS/{currentWibYear()}
           </p>
         </div>
-
-      {missingSignatureRows.length > 0 ? (
-        <Card className="mb-6 border-l-4 border-l-warn-700 p-4 print:hidden">
-          <p className="type-heading">
-            {missingSignatureRows.length} tanda tangan belum tersimpan di Google
-            Drive
-          </p>
-          <p className="type-body mt-1 text-muted">
-            Data ini dibuat sebelum penyimpanan tanda tangan ke Google Drive aktif,
-            jadi kolom URL TTD pada CSV masih kosong. Tekan sinkronisasi untuk
-            mengunggah ulang gambarnya ke folder Drive.
-          </p>
-          <div className="mt-3">
-            <Button
-              variant="accent"
-              onClick={() => {
-                void syncSignatures();
-              }}
-              disabled={syncing}
-            >
-              {syncing
-                ? "Mengunggah..."
-                : `Sinkronkan ${missingSignatureRows.length} tanda tangan ke Drive`}
-            </Button>
-          </div>
-        </Card>
-      ) : null}
-
-      {syncMessage ? (
-        <Alert tone="info" className="mb-6 print:hidden">
-          {syncMessage}
-        </Alert>
-      ) : null}
 
       {responses.length === 0 ? (
           <div className="border border-dashed border-black bg-white px-4 py-10 text-center text-sm text-black">

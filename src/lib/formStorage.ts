@@ -517,6 +517,57 @@ export interface SubmitOptions {
   signatureEndpoint?: string;
 }
 
+interface SignatureUploadInput {
+  endpoint: string;
+  formId: string;
+  respondentName: string;
+  signatureDataUrl: string;
+}
+
+function wait(ms: number): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
+
+async function uploadSignatureWithRetry({
+  endpoint,
+  formId,
+  respondentName,
+  signatureDataUrl,
+}: SignatureUploadInput): Promise<string | null> {
+  const attempts = 3;
+
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    try {
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ formId, respondentName, signatureDataUrl }),
+      });
+
+      if (response.ok) {
+        const data = (await response.json()) as { url?: string | null };
+        if (data.url) return data.url;
+      } else if (response.status < 500 && response.status !== 429) {
+        return null;
+      }
+    } catch {
+      if (attempt === attempts) {
+        console.warn("Unggah tanda tangan ke Drive gagal", formId);
+        return null;
+      }
+    }
+
+    if (attempt < attempts) {
+      await wait(500 * attempt);
+    }
+  }
+
+  console.warn("Unggah tanda tangan ke Drive gagal setelah", attempts, "percobaan");
+  return null;
+}
+
 export async function submitResponse(
   payload: SubmitPayload,
   options: SubmitOptions = {},
@@ -542,26 +593,12 @@ export async function submitResponse(
   }
 
   if (db) {
-    let signatureUrl: string | null = null;
-    try {
-      const response = await fetch(options.signatureEndpoint ?? "/api/signature", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          formId: payload.formId,
-          respondentName: payload.respondentName ?? "",
-          signatureDataUrl: payload.signatureDataUrl,
-        }),
-      });
-      if (response.ok) {
-        const data = (await response.json()) as { url?: string | null };
-        signatureUrl = data.url ?? null;
-      } else {
-        console.warn("Unggah tanda tangan ke GAS dilewati", response.status);
-      }
-    } catch {
-      signatureUrl = null;
-    }
+    const signatureUrl = await uploadSignatureWithRetry({
+      endpoint: options.signatureEndpoint ?? "/api/signature",
+      formId: payload.formId,
+      respondentName: payload.respondentName ?? "",
+      signatureDataUrl: payload.signatureDataUrl,
+    });
 
     const now = new Date().toISOString();
     const storedSignature = signatureUrl ? null : payload.signatureDataUrl;

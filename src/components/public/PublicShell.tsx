@@ -4,12 +4,13 @@ import BrandBar from "@/components/brand/BrandBar";
 
 interface PublicShellProps {
   children: ReactNode;
+  headerAction?: ReactNode;
 }
 
-export default function PublicShell({ children }: PublicShellProps) {
+export default function PublicShell({ children, headerAction }: PublicShellProps) {
   return (
     <div className="flex min-h-dvh flex-col">
-      <BrandBar />
+      <BrandBar trailing={headerAction} />
       <main className="flex-1">{children}</main>
       <AppFooter />
     </div>

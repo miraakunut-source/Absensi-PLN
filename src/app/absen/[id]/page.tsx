@@ -1,10 +1,11 @@
-"use client";
+﻿"use client";
 
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import EventHeader from "@/components/public/EventHeader";
 import PublicShell from "@/components/public/PublicShell";
 import StatusPanel from "@/components/public/StatusPanel";
+import BarIconLink from "@/components/brand/BarIconLink";
 import FormViewer from "@/components/form/FormViewer";
 import { getOpenStateMessage } from "@/lib/formStatus";
 import type { FormConfig, FormOpenState } from "@/types";
@@ -173,16 +174,34 @@ export default function AbsenPage({
     };
   }, [params]);
 
+  const homeAction = (
+    <BarIconLink href="/absen" label="Beranda">
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className="h-5 w-5"
+        aria-hidden
+      >
+        <path d="M3 10.5 12 3l9 7.5" />
+        <path d="M5 9.6V20a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V9.6" />
+      </svg>
+    </BarIconLink>
+  );
+
   if (!id) {
     return (
-      <PublicShell>
+      <PublicShell headerAction={homeAction}>
         <LoadingPanel label="Memuat..." />
       </PublicShell>
     );
   }
 
   return (
-    <PublicShell>
+    <PublicShell headerAction={homeAction}>
       <Suspense fallback={<LoadingPanel label="Memuat formulir..." />}>
         <AbsenFormContent id={id} />
       </Suspense>

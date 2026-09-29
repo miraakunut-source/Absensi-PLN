@@ -6,6 +6,7 @@ import Alert from "@/components/ui/Alert";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import Card, { CardBody, CardFooter, CardHeader } from "@/components/ui/Card";
+import ImageBackgroundControl from "@/components/admin/ImageBackgroundControl";
 import EmptyState from "@/components/ui/EmptyState";
 import Field, { ChoiceOption, CONTROL_CLASS_SM } from "@/components/ui/Field";
 import PageHeader from "@/components/ui/PageHeader";
@@ -544,9 +545,20 @@ export default function EditFormPage({
                 title="Halaman form"
                 description="Atur judul, deskripsi, dan pilihan halaman isian."
                 actions={
-                  <Button variant="secondary" size="sm" onClick={addPage}>
-                    Tambah halaman
-                  </Button>
+                  <>
+                    <ImageBackgroundControl
+                      value={config.coverImage}
+                      onChange={(dataUrl) => {
+                        updateConfig((current) => ({
+                          ...current,
+                          coverImage: dataUrl,
+                        }));
+                      }}
+                    />
+                    <Button variant="secondary" size="sm" onClick={addPage}>
+                      Tambah halaman
+                    </Button>
+                  </>
                 }
               />
               <CardBody className="space-y-5">

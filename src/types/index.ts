@@ -42,6 +42,7 @@ export interface FormConfig {
   title: string;
   description?: string;
   eventDate?: string;
+  coverImage?: string | null;
   status: FormStatus;
   opensAt?: string | null;
   closesAt?: string | null;

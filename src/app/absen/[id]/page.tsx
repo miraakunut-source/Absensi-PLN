@@ -135,6 +135,15 @@ function AbsenFormContent({ id }: { id: string }) {
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:py-8">
       <div className="mx-auto w-full max-w-2xl">
+        {config.coverImage ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={config.coverImage}
+            alt=""
+            aria-hidden
+            className="mb-5 h-40 w-full rounded-lg border border-line object-cover shadow-panel sm:h-52"
+          />
+        ) : null}
         <EventHeader
           title={config.title}
           description={config.description}

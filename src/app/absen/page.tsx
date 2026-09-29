@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import PlnMark from "@/components/brand/PlnMark";
 import PublicShell from "@/components/public/PublicShell";
 import StatusPanel from "@/components/public/StatusPanel";
 import Alert from "@/components/ui/Alert";
@@ -129,14 +128,6 @@ export default function AbsenIndexPage() {
             ))}
           </ul>
         )}
-
-        <div className="mt-8 flex items-center gap-2 border-t border-line pt-5">
-          <PlnMark compact />
-          <p className="type-caption">
-            QR Code ini tetap berlaku untuk semua kegiatan. Tempel di tembok atau
-            meja depan, lalu peserta cukup memindainya setiap kegiatan.
-          </p>
-        </div>
         </div>
       </div>
     </PublicShell>

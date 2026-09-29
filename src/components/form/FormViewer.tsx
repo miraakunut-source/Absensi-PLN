@@ -307,6 +307,15 @@ export default function FormViewer({ config, disabled }: FormViewerProps) {
     );
   }
 
+  if (pageQuestions.length === 0) {
+    return (
+      <Alert tone="warn" title="Formulir belum siap">
+        Pesanan untuk kegiatan ini belum disusun. Hubungi panitia kegiatan untuk
+        informasi lebih lanjut.
+      </Alert>
+    );
+  }
+
   return (
     <Card className="p-5 sm:p-7">
       <div className="border-b border-line pb-4">

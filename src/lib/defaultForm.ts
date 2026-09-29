@@ -1,4 +1,4 @@
-import { generateId, generateToken } from "@/lib/ids";
+﻿import { generateId, generateToken } from "@/lib/ids";
 import type { FormConfig } from "@/types";
 
 export const DEFAULT_FORM_ID = "absensi-up3-kediri";
@@ -22,63 +22,11 @@ export function createBlankForm(
     pages: [
       {
         id: "pg1",
-        title: "Data Diri",
-        questionIds: ["nama", "unit_kerja"],
-      },
-      {
-        id: "pg2",
-        title: "Kehadiran",
-        questionIds: ["tanggal", "status_hadir", "keperluan"],
-      },
-      {
-        id: "pg3",
-        title: "Tanda Tangan",
-        questionIds: ["konfirmasi"],
+        title: "Halaman 1",
+        questionIds: [],
       },
     ],
-    questions: [
-      {
-        id: "nama",
-        type: "text",
-        label: "Nama Lengkap",
-        required: true,
-        placeholder: "cth: Budi Santoso",
-      },
-      {
-        id: "unit_kerja",
-        type: "select",
-        label: "Unit Kerja",
-        required: true,
-        options: ["UP3 Kediri", "ULP", "Tim Khusus"],
-      },
-      {
-        id: "tanggal",
-        type: "date",
-        label: "Tanggal Absensi",
-        required: true,
-      },
-      {
-        id: "status_hadir",
-        type: "radio",
-        label: "Status Kehadiran",
-        required: true,
-        options: ["Hadir", "Izin", "Sakit", "Dinas Luar"],
-      },
-      {
-        id: "keperluan",
-        type: "textarea",
-        label: "Keperluan / Uraian Kegiatan",
-        required: true,
-        placeholder: "Uraian singkat kegiatan hari ini",
-      },
-      {
-        id: "konfirmasi",
-        type: "checkbox",
-        label: "Pernyataan",
-        required: true,
-        options: ["Saya menyatakan data di atas benar"],
-      },
-    ],
+    questions: [],
     createdAt: now,
     updatedAt: now,
     ...overrides,
@@ -87,6 +35,8 @@ export function createBlankForm(
     status: overrides.status ?? "open",
   };
 }
+
+
 
 export const defaultFormConfig: FormConfig = createBlankForm({
   id: DEFAULT_FORM_ID,

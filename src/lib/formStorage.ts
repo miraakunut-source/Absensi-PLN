@@ -13,7 +13,7 @@ import {
   updateDoc,
   where,
 } from "firebase/firestore";
-import { createBlankForm, defaultFormConfig } from "@/lib/defaultForm";
+import { createBlankForm } from "@/lib/defaultForm";
 import { generateId } from "@/lib/ids";
 import { getFormOpenState } from "@/lib/formStatus";
 import { db } from "@/lib/firebase";
@@ -252,10 +252,6 @@ export async function getConfig(formId: string): Promise<FormConfig | null> {
   const local = readLocalConfig(formId);
   if (local) return local;
 
-  if (formId === defaultFormConfig.id) {
-    return defaultFormConfig;
-  }
-
   return null;
 }
 
@@ -297,10 +293,6 @@ export async function getConfigByToken(
     if (config?.token === token) return config;
   }
 
-  if (defaultFormConfig.token === token) {
-    return defaultFormConfig;
-  }
-
   return null;
 }
 
@@ -321,8 +313,7 @@ export async function listForms(): Promise<FormConfig[]> {
       }
     }
     await migrateLocalForms(localOnly);
-    const merged = [...remote, ...localOnly];
-    return merged.length > 0 ? merged : [defaultFormConfig];
+    return [...remote, ...localOnly];
   }
 
   const supabase = await getSupabase();
@@ -350,10 +341,6 @@ export async function listForms(): Promise<FormConfig[]> {
   for (const id of ids) {
     const config = readLocalConfig(id);
     if (config) local.push(config);
-  }
-
-  if (local.length === 0) {
-    return [defaultFormConfig];
   }
 
   return local;

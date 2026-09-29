@@ -18,9 +18,9 @@ export default function HomePage() {
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:py-8">
         <div className="mx-auto w-full max-w-3xl">
           <div className="border-b border-line pb-6">
-            <h1 className="type-display">Absensi kegiatan UP3 Kediri</h1>
+            <h1 className="type-display">Presensi kegiatan UP3 Kediri</h1>
             <p className="type-body mt-3 max-w-xl text-muted">
-              Form absensi resmi PLN UP3 Kediri. Peserta memindai QR Code
+              Form presensi resmi PLN UP3 Kediri. Peserta memindai QR Code
               kegiatan dan mengisi isian langsung di HP — tanpa akun, tanpa
               install aplikasi.
             </p>
@@ -29,7 +29,7 @@ export default function HomePage() {
         <Card className="mt-6">
           <CardHeader
             title="Untuk peserta"
-            description="Absensi dibuka lewat QR Code kegiatan yang dibagikan panitia."
+            description="Presensi dibuka lewat QR Code kegiatan yang dibagikan panitia."
           />
           <div className="px-5 py-5">
             <p className="type-body text-muted">
@@ -43,7 +43,7 @@ export default function HomePage() {
         <Card className="mt-6">
           <CardHeader
             title="Untuk admin"
-            description="Dashboard, editor form, dan rekap absensi."
+            description="Dashboard, editor form, dan rekap presensi."
           />
           <div className="px-5 py-5">
             <p className="type-body text-muted">
@@ -69,7 +69,7 @@ export default function HomePage() {
               },
               {
                 step: "Kirim",
-                text: "Klik kirim absensi. Data langsung tercatat di rekap panitia beserta tanda tangannya.",
+                text: "Klik kirim presensi. Data langsung tercatat di rekap panitia beserta tanda tangannya.",
               },
             ].map((item, index) => (
               <li key={item.step} className="border-l-2 border-gold-500 pl-4">

@@ -107,7 +107,7 @@ export default function EditFormPage({
           savedDraft ??
           createBlankForm({
             id: formId,
-            title: "Kegiatan Absensi Baru",
+            title: "Kegiatan Presensi Baru",
           });
         isDraftRef.current = true;
         setConfig(draft);
@@ -363,7 +363,7 @@ export default function EditFormPage({
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:py-8">
       <PageHeader
-        title="Atur kegiatan absensi"
+        title="Atur kegiatan presensi"
         description="Sesuaikan informasi kegiatan, halaman form, pertanyaan, dan QR Code untuk peserta."
         actions={
           <Button variant="accent" onClick={handleSave} disabled={saving}>
@@ -397,7 +397,7 @@ export default function EditFormPage({
               title="Informasi kegiatan"
               actions={
                 <Field
-                  label="Status absensi"
+                  label="Status presensi"
                   htmlFor="form-status"
                   className="w-44"
                 >
@@ -934,7 +934,7 @@ export default function EditFormPage({
           >
             <div className="mb-4 flex items-center justify-between gap-3 print:hidden">
               <p id="print-qr-title" className="type-heading">
-                Cetak QR absensi
+                Cetak QR presensi
               </p>
               <div className="flex gap-2">
                 <Button
@@ -962,7 +962,7 @@ export default function EditFormPage({
               <p className="type-caption">{config.eventDate ?? ""}</p>
               <QRCodeCanvas value={formUrl} size={240} marginSize={2} />
               <p className="type-body text-body">
-                Pindai QR untuk mengisi absensi
+                Pindai QR untuk mengisi presensi
               </p>
               <p className="type-caption max-w-xs break-all font-mono">
                 {formUrl}

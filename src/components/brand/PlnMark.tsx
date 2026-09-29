@@ -37,7 +37,7 @@ export default function PlnMark({
               inverted ? "text-white/70" : ""
             }`}
           >
-            Sistem Absensi Kegiatan
+            Sistem Presensi Kegiatan
           </span>
         ) : null}
       </span>

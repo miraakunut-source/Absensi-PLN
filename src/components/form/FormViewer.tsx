@@ -220,7 +220,7 @@ export default function FormViewer({ config, disabled }: FormViewerProps) {
 
   const handleSubmit = async () => {
     if (disabled) {
-      setError("Formulir sudah ditutup. Pengiriman absensi tidak diterima.");
+      setError("Formulir sudah ditutup. Pengiriman presensi tidak diterima.");
       return;
     }
     if (invalid.length > 0) {
@@ -260,7 +260,7 @@ export default function FormViewer({ config, disabled }: FormViewerProps) {
         };
         throw new Error(
           data.error ||
-            "Absensi gagal dikirim. Periksa koneksi internet Anda lalu coba lagi.",
+            "Presensi gagal dikirim. Periksa koneksi internet Anda lalu coba lagi.",
         );
       }
 
@@ -269,7 +269,7 @@ export default function FormViewer({ config, disabled }: FormViewerProps) {
       setError(
         submitError instanceof Error
           ? submitError.message
-          : "Absensi gagal dikirim. Periksa koneksi internet Anda lalu coba lagi.",
+          : "Presensi gagal dikirim. Periksa koneksi internet Anda lalu coba lagi.",
       );
     } finally {
       setSubmitting(false);
@@ -287,12 +287,12 @@ export default function FormViewer({ config, disabled }: FormViewerProps) {
   if (submitted) {
     return (
       <div className="space-y-5">
-        <Alert tone="success" title="Absensi terkirim">
+        <Alert tone="success" title="Presensi terkirim">
           {config.confirmationMessage ||
-            "Terima kasih. Data absensi Anda sudah diterima panitia."}
+            "Terima kasih. Data presensi Anda sudah diterima panitia."}
         </Alert>
         <Button variant="secondary" onClick={resetForm} fullWidth>
-          Isi absensi lagi
+          Isi presensi lagi
         </Button>
       </div>
     );
@@ -365,7 +365,7 @@ export default function FormViewer({ config, disabled }: FormViewerProps) {
               </span>
             </p>
             <p className="type-caption mb-3 mt-1">
-              Tanda tangan wajib diisi sebelum absensi dikirim.
+              Tanda tangan wajib diisi sebelum presensi dikirim.
             </p>
             <SignaturePad onChange={setSignature} />
           </div>
@@ -380,7 +380,7 @@ export default function FormViewer({ config, disabled }: FormViewerProps) {
 
       {disabled ? (
         <Alert tone="warn" className="mt-6">
-          Formulir sudah ditutup. Anda tidak dapat mengirim absensi melalui
+          Formulir sudah ditutup. Anda tidak dapat mengirim presensi melalui
           tautan ini.
         </Alert>
       ) : null}
@@ -407,7 +407,7 @@ export default function FormViewer({ config, disabled }: FormViewerProps) {
             fullWidth
             className="sm:w-auto"
           >
-            {submitting ? "Mengirim absensi..." : "Kirim absensi"}
+            {submitting ? "Mengirim presensi..." : "Kirim presensi"}
           </Button>
         ) : (
           <Button

@@ -9,9 +9,9 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
-  title: "Absensi PLN UP3 Kediri",
+  title: "Presensi PLN UP3 Kediri",
   description:
-    "Sistem absensi digital PT PLN (PERSERO) UP3 Kediri pengganti Google Form.",
+    "Sistem presensi digital PT PLN (PERSERO) UP3 Kediri pengganti Google Form.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

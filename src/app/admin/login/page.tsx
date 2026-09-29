@@ -113,7 +113,7 @@ export default function AdminLoginPage() {
             <h1 className="type-display">Login Admin</h1>
             <p className="type-body mt-2 text-muted">
               Gunakan akun admin yang terdaftar di Firebase Authentication.
-              Peserta tidak perlu login untuk mengisi absensi.
+              Peserta tidak perlu login untuk mengisi presensi.
             </p>
           </div>
 

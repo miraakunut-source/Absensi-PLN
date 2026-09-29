@@ -116,7 +116,7 @@ export default function ResponsesView({ formId }: ResponsesViewProps) {
         setError(
           loadError instanceof Error
             ? loadError.message
-            : "Gagal memuat rekap absensi. Muat ulang halaman atau periksa koneksi.",
+            : "Gagal memuat rekap presensi. Muat ulang halaman atau periksa koneksi.",
         );
       } finally {
         if (!cancelled) setLoading(false);
@@ -152,13 +152,13 @@ export default function ResponsesView({ formId }: ResponsesViewProps) {
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/(^-|-$)/g, "");
-    downloadTextFile(`absensi-${safeTitle || "kegiatan"}.csv`, csv, "text/csv");
+    downloadTextFile(`presensi-${safeTitle || "kegiatan"}.csv`, csv, "text/csv");
   };
 
   if (loading) {
     return (
       <div className="mx-auto max-w-6xl px-4 py-6 text-center sm:py-8">
-        <p className="type-body text-muted">Memuat rekap absensi...</p>
+        <p className="type-body text-muted">Memuat rekap presensi...</p>
       </div>
     );
   }
@@ -240,7 +240,7 @@ export default function ResponsesView({ formId }: ResponsesViewProps) {
         <Card className="mb-6 print:hidden">
           <EmptyState
             compact
-            title="Belum ada peserta yang mengisi absensi"
+            title="Belum ada peserta yang mengisi presensi"
             description="Bagikan QR Code atau tautan kegiatan kepada peserta. Jawaban akan muncul di tabel ini setelah terkirim."
           />
         </Card>
@@ -390,7 +390,7 @@ export default function ResponsesView({ formId }: ResponsesViewProps) {
 
         <div className="mb-6 text-center text-black">
           <h3 className="text-base font-bold uppercase tracking-wide text-black">
-            Laporan Absensi Kegiatan
+            Laporan Presensi Kegiatan
           </h3>
           <p className="mt-1 text-sm font-semibold break-words">
             {config.title}
@@ -409,7 +409,7 @@ export default function ResponsesView({ formId }: ResponsesViewProps) {
 
       {responses.length === 0 ? (
           <div className="border border-dashed border-black bg-white px-4 py-10 text-center text-sm text-black">
-            Belum ada data absensi untuk kegiatan ini.
+            Belum ada data presensi untuk kegiatan ini.
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -483,7 +483,7 @@ export default function ResponsesView({ formId }: ResponsesViewProps) {
           </div>
           <div className="text-left text-[12px] sm:text-right">
             <p>Kediri, {formatLongDate(new Date())}</p>
-            <p className="mt-1">Petugas Rekap Absensi</p>
+            <p className="mt-1">Petugas Rekap Presensi</p>
             <div className="ml-auto mt-16 min-w-48 border-b border-dotted border-black" />
             <p className="mt-1 font-semibold">...............................</p>
             <p className="text-[11px]">NIP. ............................</p>

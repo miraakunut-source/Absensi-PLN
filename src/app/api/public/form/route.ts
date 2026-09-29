@@ -36,7 +36,7 @@ export async function GET(request: Request): Promise<Response> {
         error:
           error instanceof Error
             ? error.message
-            : "Gagal memuat formulir absensi.",
+            : "Gagal memuat formulir presensi.",
       },
       { status: 500 },
     );

@@ -177,7 +177,7 @@ export default function AdminDashboardPage() {
     {
       label: "Total kegiatan",
       value: stats.totalForms,
-      hint: "semua form absensi",
+      hint: "semua form presensi",
       accent: "border-l-line-strong",
       valueClass: "text-ink",
     },
@@ -194,8 +194,8 @@ export default function AdminDashboardPage() {
     <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:py-8">
       <div className="print:hidden">
         <PageHeader
-          title="Dashboard absensi"
-          description="Ringkasan kegiatan, jumlah peserta, serta kontrol buka dan tutup absensi peserta. Formulir baru hanya tersimpan setelah Anda menekan Simpan formulir di editor."
+          title="Dashboard presensi"
+          description="Ringkasan kegiatan, jumlah peserta, serta kontrol buka dan tutup presensi peserta. Formulir baru hanya tersimpan setelah Anda menekan Simpan formulir di editor."
           actions={
             <Button
               size="lg"
@@ -237,7 +237,7 @@ export default function AdminDashboardPage() {
         <Card tone="transparent" className="border border-line">
         <CardHeader
           title="Daftar kegiatan"
-          description="Edit pertanyaan, buka tautan peserta, atau tutup absensi saat kegiatan selesai."
+          description="Edit pertanyaan, buka tautan peserta, atau tutup presensi saat kegiatan selesai."
         />
 
         {loading ? (
@@ -251,7 +251,7 @@ export default function AdminDashboardPage() {
           <EmptyState
             compact
             title="Belum ada kegiatan"
-            description="Buat kegiatan baru untuk menyiapkan form absensi, lalu bagikan QR Code kepada peserta."
+            description="Buat kegiatan baru untuk menyiapkan form presensi, lalu bagikan QR Code kepada peserta."
             action={
               <Button
                 onClick={() => {
@@ -382,8 +382,8 @@ export default function AdminDashboardPage() {
                       {busy
                         ? "Memproses..."
                         : open
-                          ? "Tutup absensi"
-                          : "Buka absensi"}
+                          ? "Tutup presensi"
+                          : "Buka presensi"}
                     </Button>
                     <Button
                       variant="danger"

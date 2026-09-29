@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import ResponsesView from "./ResponsesView";
 
 export const metadata: Metadata = {
-  title: "Rekap Absensi | UP3 Kediri",
+  title: "Rekap Presensi | UP3 Kediri",
 };
 
 interface RekapPageProps {

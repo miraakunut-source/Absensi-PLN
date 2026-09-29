@@ -622,7 +622,7 @@ export async function submitResponse(
     };
 
     if (!response.ok) {
-      throw new Error(data.error || "Gagal mengirim absensi");
+      throw new Error(data.error || "Gagal mengirim presensi");
     }
 
     return {

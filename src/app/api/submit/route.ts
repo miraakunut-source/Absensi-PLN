@@ -93,7 +93,7 @@ export async function POST(request: Request): Promise<Response> {
         max_reached: "Kuota peserta sudah penuh",
       };
       return Response.json(
-        { error: messages[state] ?? "Form tidak menerima absensi" },
+        { error: messages[state] ?? "Form tidak menerima presensi" },
         { status: 403 },
       );
     }
@@ -140,7 +140,7 @@ export async function POST(request: Request): Promise<Response> {
   if (error || !data) {
     return Response.json(
       {
-        error: error?.message || "Gagal menyimpan absensi ke database",
+        error: error?.message || "Gagal menyimpan presensi ke database",
       },
       { status: 500 },
     );

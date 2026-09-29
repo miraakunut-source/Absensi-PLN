@@ -1,4 +1,4 @@
-﻿import { generateId, generateToken } from "@/lib/ids";
+import { generateId, generateToken } from "@/lib/ids";
 import type { FormConfig } from "@/types";
 
 export const DEFAULT_FORM_ID = "absensi-up3-kediri";
@@ -11,14 +11,14 @@ export function createBlankForm(
   const token = overrides.token ?? generateToken();
 
   return {
-    title: "Kegiatan Absensi Baru",
+    title: "Kegiatan Presensi Baru",
     description: "",
     eventDate: new Date().toISOString().slice(0, 10),
     opensAt: null,
     closesAt: null,
     maxResponses: null,
     confirmationMessage:
-      "Terima kasih. Absensi Anda berhasil dikirim dan telah tercatat.",
+      "Terima kasih. Presensi Anda berhasil dikirim dan telah tercatat.",
     pages: [
       {
         id: "pg1",
@@ -41,9 +41,9 @@ export function createBlankForm(
 export const defaultFormConfig: FormConfig = createBlankForm({
   id: DEFAULT_FORM_ID,
   token: "devtokenabsensiup3kediri",
-  title: "Formulir Absensi Pegawai",
+  title: "Formulir Presensi Pegawai",
   description:
-    "Absensi resmi UP3 Kediri. Isi data dengan benar dan tanda tangani sebelum mengirim.",
+    "Presensi resmi UP3 Kediri. Isi data dengan benar dan tanda tangani sebelum mengirim.",
   eventDate: new Date().toISOString().slice(0, 10),
   status: "open",
   pages: [
@@ -109,7 +109,7 @@ export const defaultFormConfig: FormConfig = createBlankForm({
     {
       id: "tanggal",
       type: "date",
-      label: "Tanggal Absensi",
+      label: "Tanggal Presensi",
       required: true,
     },
     {

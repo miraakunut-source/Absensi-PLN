@@ -28,7 +28,7 @@ export default function EventHeader({
   return (
     <div className="border-b border-line pb-6">
       <div className="text-center">
-        <p className="type-caption text-brand-700">Formulir absensi kegiatan</p>
+        <p className="type-caption text-brand-700">Formulir presensi kegiatan</p>
         <h1 className="type-display mt-2 break-words">{title}</h1>
         {eventDate ? (
           <p className="type-body mt-3 text-muted">

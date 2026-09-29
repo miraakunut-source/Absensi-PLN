@@ -87,7 +87,7 @@ export async function POST(request: Request): Promise<Response> {
         error:
           error instanceof Error
             ? error.message
-            : "Absensi gagal dikirim. Coba lagi.",
+            : "Presensi gagal dikirim. Coba lagi.",
       },
       { status: 400 },
     );

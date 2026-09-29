@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
@@ -87,7 +87,7 @@ function AbsenFormContent({ id }: { id: string }) {
   }, [id]);
 
   if (loading) {
-    return <LoadingPanel label="Memuat formulir absensi..." />;
+    return <LoadingPanel label="Memuat formulir presensi..." />;
   }
 
   if (error === "not_found" || !config) {
@@ -98,7 +98,7 @@ function AbsenFormContent({ id }: { id: string }) {
           title="Form tidak ditemukan"
           message={
             error === "not_found"
-              ? "QR Code atau tautan ini tidak terdaftar. Pastikan Anda memindai QR resmi dari panitia, atau minta tautan absensi terbaru kepada panitia kegiatan."
+              ? "QR Code atau tautan ini tidak terdaftar. Pastikan Anda memindai QR resmi dari panitia, atau minta tautan presensi terbaru kepada panitia kegiatan."
               : (error ?? "Formulir ini tidak dapat dimuat.")
           }
         />
@@ -110,19 +110,19 @@ function AbsenFormContent({ id }: { id: string }) {
 
   if (blocked && !preview) {
     const titles: Record<string, string> = {
-      closed_manual: "Absensi sudah ditutup",
-      not_started: "Absensi belum dibuka",
-      deadline_passed: "Batas waktu absensi berakhir",
+      closed_manual: "Presensi sudah ditutup",
+      not_started: "Presensi belum dibuka",
+      deadline_passed: "Batas waktu presensi berakhir",
       max_reached: "Kuota peserta sudah penuh",
     };
     return (
       <div className="mx-auto max-w-2xl px-4 py-8">
         <StatusPanel
           tone="warn"
-          title={titles[openState ?? ""] ?? "Absensi tidak dapat diisi"}
+          title={titles[openState ?? ""] ?? "Presensi tidak dapat diisi"}
           message={
             openState
-              ? `${getOpenStateMessage(openState)} Hubungi panitia kegiatan jika Anda merasa seharusnya masih dapat mengisi absensi.`
+              ? `${getOpenStateMessage(openState)} Hubungi panitia kegiatan jika Anda merasa seharusnya masih dapat mengisi presensi.`
               : "Formulir ini sedang tidak menerima pengisian. Hubungi panitia kegiatan untuk informasi lebih lanjut."
           }
         />

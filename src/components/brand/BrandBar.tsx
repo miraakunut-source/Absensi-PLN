@@ -4,18 +4,24 @@ import PlnMark from "./PlnMark";
 interface BrandBarProps {
   trailing?: ReactNode;
   topRight?: ReactNode;
+  className?: string;
   children?: ReactNode;
 }
 
 export default function BrandBar({
   trailing,
   topRight,
+  className,
   children,
 }: BrandBarProps) {
   const links = trailing || children;
 
   return (
-    <header className="border-t-[3px] border-gold-500 bg-brand-800">
+    <header
+      className={`border-t-[3px] border-gold-500 bg-brand-800 ${
+        className ?? ""
+      }`}
+    >
       <div className="mx-auto flex w-full max-w-6xl items-center gap-2 px-4 py-3 sm:gap-3">
         <PlnMark inverted />
         {links ? (

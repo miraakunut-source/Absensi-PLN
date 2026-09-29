@@ -104,10 +104,10 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="photo-surface flex min-h-dvh flex-col">
-      <BrandBar />
+    <div className="photo-surface flex h-dvh flex-col overflow-hidden">
+      <BrandBar className="shrink-0" />
 
-      <main className="flex flex-1 items-center justify-center px-4 py-10">
+      <main className="flex min-h-0 flex-1 items-center justify-center overflow-y-auto px-4 py-6">
         <div className="w-full max-w-md">
           <div className="text-center">
             <h1 className="type-display">Login Admin</h1>
@@ -117,7 +117,7 @@ export default function AdminLoginPage() {
             </p>
           </div>
 
-          <Card className="mt-6 p-6">
+          <Card className="mt-5 p-5 sm:p-6">
             <form onSubmit={handleSubmit} className="space-y-5">
               <Field label="Email" htmlFor="email">
                 <input
@@ -164,7 +164,7 @@ export default function AdminLoginPage() {
             </form>
           </Card>
 
-          <div className="mt-5 text-center">
+          <div className="mt-4 text-center">
             <Link
               href="/"
               className="text-sm font-semibold text-brand-700 hover:text-brand-800"
@@ -174,7 +174,7 @@ export default function AdminLoginPage() {
           </div>
         </div>
       </main>
-      <AppFooter />
+      <AppFooter className="shrink-0" />
     </div>
   );
 }

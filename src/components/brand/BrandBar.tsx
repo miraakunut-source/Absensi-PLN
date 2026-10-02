@@ -31,7 +31,9 @@ export default function BrandBar({
           </div>
         ) : null}
         {topRight ? (
-          <div className={links ? "" : "ml-auto shrink-0"}>{topRight}</div>
+          <div className={`flex items-center gap-1 ${links ? "" : "ml-auto shrink-0"}`}>
+            {topRight}
+          </div>
         ) : null}
       </div>
     </header>

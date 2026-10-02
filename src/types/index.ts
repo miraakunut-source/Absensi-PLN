@@ -63,3 +63,28 @@ export interface FormResponse {
   signatureDataUrl?: string | null;
   createdAt: string;
 }
+
+export interface AppSettings {
+  gasWebAppUrl: string;
+  driveFolderId: string;
+  firebaseApiKey: string;
+  firebaseAuthDomain: string;
+  firebaseProjectId: string;
+  firebaseStorageBucket: string;
+}
+
+export type AppSettingsSource = "firestore" | "env" | "mixed";
+
+export interface AppSettingsState {
+  settings: AppSettings;
+  source: AppSettingsSource;
+  updatedAt: string | null;
+  updatedBy: string | null;
+}
+
+export interface GasConnectionResult {
+  ok: boolean;
+  status: number | null;
+  method: "GET" | "POST" | null;
+  message: string;
+}

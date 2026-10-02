@@ -1,3 +1,5 @@
+import { getGasWebAppUrl } from "@/lib/appSettings";
+
 export interface UploadSignatureInput {
   formId: string;
   respondentName?: string;
@@ -8,12 +10,10 @@ export interface UploadSignatureResult {
   url: string | null;
 }
 
-function getGasUrl(): string | null {
-  return (
-    process.env.GAS_WEB_APP_URL ||
-    process.env.NEXT_PUBLIC_GAS_URL ||
-    null
-  );
+async function resolveGasUrl(): Promise<string | null> {
+  const stored = await getGasWebAppUrl();
+  if (stored) return stored;
+  return process.env.GAS_WEB_APP_URL || process.env.NEXT_PUBLIC_GAS_URL || null;
 }
 
 function splitDataUrl(dataUrl: string): {
@@ -43,7 +43,7 @@ function normalizeDriveUrl(url: string): string {
 export async function uploadSignature(
   input: UploadSignatureInput,
 ): Promise<UploadSignatureResult> {
-  const gasUrl = getGasUrl();
+  const gasUrl = await resolveGasUrl();
 
   if (!gasUrl) {
     return { url: null };
